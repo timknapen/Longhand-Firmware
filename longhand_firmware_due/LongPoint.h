@@ -1,5 +1,3 @@
-// Longhand Firmware
-
 #ifndef _LongPoint_h_
 #define _LongPoint_h_
 

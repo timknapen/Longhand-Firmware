@@ -1,5 +1,3 @@
-// Longhand Firmware
-
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
@@ -9,7 +7,7 @@
 // #define FULLDEBUG // uncomment to show really a LOT of debug info like every step position.
 
 #define INVERT_X_DIR     1
-#define INVERT_Y_DIR     0
+#define INVERT_Y_DIR     1
 #define INVERT_Z_DIR     1
 
 

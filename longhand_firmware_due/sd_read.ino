@@ -1,5 +1,3 @@
-// Longhand Firmware
-
 #include <SD.h>
 #include "LongPoint.h"
 #include "pins.h"
@@ -37,9 +35,45 @@ void getFileList(){ //print out all the .LHD files on the SD card
 				entry.close();
 				continue;
 			}
-			// if we are here, we have a good file, so parse it and break out of the loop!
+			// if we are here, we have a good file, so print it
 			SerialUSB.print("_f");
 			SerialUSB.println(entry.name());
+            delayMicroseconds(5);
+		}
+		entry.close();
+	}
+	if(root){
+		root.close();
+	}
+}
+
+//----------------------------------------------------------------------
+void deleteAllFiles(){
+    
+    init_SD();
+	root = SD.open("/");
+	root.rewindDirectory();
+	SerialUSB.println("DELETE Files:");
+	while(true) {
+		File entry =  root.openNextFile();
+		if (!entry) {
+			break;
+		}
+		if (!entry.isDirectory()) {
+			// do some more checking
+			char* filename = entry.name();
+			if(filename[0] == '~' || filename[0] == '.' || filename[0] == '_'){
+				entry.close();
+				continue;
+			}
+			if(!hasExtension(entry, ".LHD")){
+				entry.close();
+				continue;
+			}
+			// if we are here
+			SerialUSB.print(" delete ");
+			SerialUSB.println(filename);
+            SD.remove(filename);
 		}
 		entry.close();
 	}
@@ -114,6 +148,8 @@ void parseFileContents(File file){
 		memPos.y = current_pos.y;
 		memPos.z = current_pos.z;
 	}
+    offSet.x = current_pos.x;
+    offSet.y = current_pos.y;
 	
 	
 	if(file){
@@ -158,11 +194,16 @@ void parseFileContents(File file){
 				break;
 			}
 		}
-		goHome();
+		//goHome();
+        // lift pen
+        moveTo(current_pos.x, current_pos.y, 100); // brush up at current position
+        moveTo(offSet.x, offSet.y);
 		if(testrun){
 			// set the pen back to where it was.
 			set_position(memPos.x, memPos.y, memPos.z);
 		}
+        offSet.x = 0;
+        offSet.y = 0;
 	}else{
 		SerialUSB.println("parseFileContents got passed a bad file");
 	}

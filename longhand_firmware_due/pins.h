@@ -1,53 +1,49 @@
-// Longhand Firmware
-
 #ifndef PINS_H
 #define PINS_H
 
 /****************************************************************************************
  * Arduino DUE pin assignment
  * 
+ * These are the pins for Longhand Controller PCB V1
+ *
  ****************************************************************************************/
- 
+
 
 #define CSPIN 4
 
-// POWER PINS
-// to power the stepper drivers we take the power from two high current pins on the Due
-// a high current pin on Arduino Due can source 15mA and our stepper drivers take max 8mA
-
 // X STEPPER
-#define X_ENABLE_PIN	(byte)22
-#define X_STEP_PIN		(byte)23
-#define X_POWER_PIN		(byte)24
-#define X_DIR_PIN		(byte)25
+#define X_ENABLE_PIN    (byte)10
+#define X_STEP_PIN      (byte)12
+#define X_DIR_PIN       (byte)11
 
 
 // Y STEPPER
-#define Y_ENABLE_PIN	(byte)26
-#define Y_STEP_PIN		(byte)27
-#define Y_POWER_PIN		(byte)28
-#define Y_DIR_PIN		(byte)29
+#define Y_ENABLE_PIN	(byte)22
+#define Y_STEP_PIN	(byte)30
+#define Y_DIR_PIN	(byte)34
 
 
 // Z STEPPER
-#define Z_ENABLE_PIN	(byte)30
-#define Z_STEP_PIN		(byte)31
-#define Z_POWER_PIN		(byte)32
-#define Z_DIR_PIN		(byte)33
+#define Z_ENABLE_PIN	(byte)44
+#define Z_STEP_PIN      (byte)50
+#define Z_DIR_PIN	(byte)52
 
 
 // MICRO STEPPING
-#define MS1_PIN			(byte)34
-#define MS2_PIN			(byte)35
-#define MS3_PIN			(byte)36	
+// micro stepping is done by jumper in Longhand Controller PCB v1
+// so we don't really use these anymore
+//#define MS1_PIN			(byte)23
+//#define MS2_PIN			(byte)24
+//#define MS3_PIN			(byte)25
 
 
 // END STOPS
-#define X_MIN_PIN		(byte)37
-#define Y_MIN_PIN		(byte)38	
-#define Z_MIN_PIN		(byte)39
+#define X_MIN_PIN		(byte)9	       
+#define Y_MIN_PIN		(byte)2
+#define Z_MIN_PIN		(byte)3
 
 
 #endif
+
 
 
