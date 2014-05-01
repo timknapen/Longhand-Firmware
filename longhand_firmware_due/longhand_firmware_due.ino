@@ -23,7 +23,7 @@
  ------------------------------------------------------------*/
 
 // SERIAL
-//#define BAUD 115200						// 115200		// serialUSB doesn't need a baud rate !
+//#define BAUD 115200			// serialUSB doesn't need a baud rate !
 #define bufferLength 64                     // serial buffer length
 char serialBuffer[bufferLength];            // serial buffer
 int iSerialBuf = 0;							// position in the serialBuffer
