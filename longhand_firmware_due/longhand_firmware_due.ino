@@ -1,6 +1,6 @@
 #include <SPI.h>
 #include <SD.h>
-#include "parameters.h"						// all settings are inside parameters.h
+#include "parameters.h"
 #include "pins.h"
 #include "LongPoint.h"
 #include "Arduino.h"
