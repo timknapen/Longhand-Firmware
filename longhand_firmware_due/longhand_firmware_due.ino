@@ -7,9 +7,9 @@
 
 /*------------------------------------------------------------
  
- LONGHAND DRAWING MACHINE firmware V2
+ LONGHAND DRAWING MACHINE firmware V2.2
  
- last update 21/04/2014
+ last update 01/05/2014
  by Tim Knapen
  http://www.longhand.cc/
  
