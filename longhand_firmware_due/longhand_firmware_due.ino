@@ -6,10 +6,10 @@
 #include "Arduino.h"
 
 /*------------------------------------------------------------
- 
+
  LONGHAND DRAWING MACHINE firmware V2.2
  
- last update 01/05/2014
+ last update 02/05/2014
  by Tim Knapen
  http://www.longhand.cc/
  
@@ -18,9 +18,16 @@
  + Longhand PCB V1
  + 4 Pololu A4988 stepper motor driver carriers
  
- Compiles with Arduino IDE 1.5.2
+ Compiled and tested with IDE
+ - Arduino 1.5.2
+ - Arduino 1.5.6-r2
  
  ------------------------------------------------------------*/
+
+// This is meant for Arduino DUE!
+#ifndef _VARIANT_ARDUINO_DUE_X_
+#error Please compile for Arduino Due!
+#endif
 
 // SERIAL
 //#define BAUD 115200			// serialUSB doesn't need a baud rate !
