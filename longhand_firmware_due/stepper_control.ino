@@ -1,12 +1,6 @@
-//#include "digitalWriteFast.h"
 #include "pins.h"
 #include "Arduino.h"
 #include "LongPoint.h"
-
-#ifndef digitalWriteFast
-#warning ---- digitalWriteFast was NOT defined! ----
-#define digitalWriteFast(u,v) digitalWrite(u,v)
-#endif
 
 
 // Our direction vars
@@ -58,9 +52,9 @@ void init_steppers()
 	pinMode(X_MIN_PIN, INPUT);
 	pinMode(Y_MIN_PIN, INPUT);
 	pinMode(Z_MIN_PIN, INPUT);
-	digitalWriteFast(X_MIN_PIN, HIGH); // set internal 100 KOhm pull up resistor
-	digitalWriteFast(Y_MIN_PIN, HIGH);
-	digitalWriteFast(Z_MIN_PIN, HIGH);
+	digitalWrite(X_MIN_PIN, HIGH); // set internal 100 KOhm pull up resistor
+	digitalWrite(Y_MIN_PIN, HIGH);
+	digitalWrite(Z_MIN_PIN, HIGH);
 	
 	
 	// get the microSteps pins set
@@ -90,21 +84,21 @@ void calculate_deltas()
 	
 	// set our direction pins
 #if INVERT_X_DIR == 1
-	digitalWriteFast(X_DIR_PIN, !x_direction);
+	digitalWrite(X_DIR_PIN, !x_direction);
 #else
-	digitalWriteFast(X_DIR_PIN, x_direction);
+	digitalWrite(X_DIR_PIN, x_direction);
 #endif
 	
 #if INVERT_Y_DIR == 1
-	digitalWriteFast(Y_DIR_PIN, !y_direction);
+	digitalWrite(Y_DIR_PIN, !y_direction);
 #else
-	digitalWriteFast(Y_DIR_PIN, y_direction);
+	digitalWrite(Y_DIR_PIN, y_direction);
 #endif
 	
 #if INVERT_Z_DIR == 1
-	digitalWriteFast(Z_DIR_PIN, !z_direction);
+	digitalWrite(Z_DIR_PIN, !z_direction);
 #else
-	digitalWriteFast(Z_DIR_PIN, z_direction);
+	digitalWrite(Z_DIR_PIN, z_direction);
 #endif
 }
 
@@ -124,15 +118,15 @@ void findHome(){
 	
 	// set our direction pins
 #if INVERT_X_DIR == 1
-	digitalWriteFast(X_DIR_PIN, !x_direction);
+	digitalWrite(X_DIR_PIN, !x_direction);
 #else
-	digitalWriteFast(X_DIR_PIN, x_direction);
+	digitalWrite(X_DIR_PIN, x_direction);
 #endif
 	
 #if INVERT_Y_DIR == 1
-	digitalWriteFast(Y_DIR_PIN, !y_direction);
+	digitalWrite(Y_DIR_PIN, !y_direction);
 #else
-	digitalWriteFast(Y_DIR_PIN, y_direction);
+	digitalWrite(Y_DIR_PIN, y_direction);
 #endif
 	
 	x_can_step = checkEndstop( X_MIN_PIN, x_direction );
@@ -248,13 +242,22 @@ void dda_move(long micro_delay)
 	y_can_step = (current_pos.y != target_pos.y) && checkEndstop( Y_MIN_PIN, y_direction ); // added endstop check
 	z_can_step = (current_pos.z != target_pos.z);
     
-	if(max_delta == 0){
-#ifdef FULLDEBUG
-		if(debug){
-			SerialUSB.println("dda_move 0 distance!");
+	if(max_delta == 0){ // no move, do nothing
+		if(debug > 1){
+			SerialUSB.println("dda_move 0 distance!:");
+            SerialUSB.print(current_pos.x);
+            SerialUSB.print(",");
+            SerialUSB.print(current_pos.y);
+            SerialUSB.print(",");
+            SerialUSB.print(current_pos.z);
+            SerialUSB.print(" delta: ");
+            SerialUSB.print(delta_steps.x);
+            SerialUSB.print(",");
+            SerialUSB.print(delta_steps.y);
+            SerialUSB.print(",");
+            SerialUSB.println(delta_steps.z);
 		}
 		return;
-#endif
 	}
 	
 	bool x_needs_to_step, y_needs_to_step, z_needs_to_step;
@@ -317,8 +320,7 @@ void dda_move(long micro_delay)
 		if(!testrun){
 			long acceleration_delay = current_delay - acceleration;
 			long decceleration_delay = target_delay - acceleration * current_delta;
-			current_delay = max( min_delay, max(acceleration_delay, decceleration_delay));
-			
+			current_delay = max( min_delay, max(acceleration_delay, decceleration_delay));        
 			
 			// how long do we delay for?
 			if (current_delay >= 16383){
@@ -331,9 +333,9 @@ void dda_move(long micro_delay)
 			}
 		}
 		// now I should have done a step and should be able to print out the position
-#ifdef FULLDEBUG
-		printPos(current_pos.x, current_pos.y, current_pos.z);
-#endif
+        if(debug > 1){
+            printPos(current_pos.x, current_pos.y, current_pos.z);
+        }
 		current_delta --;
 		
 		x_can_step = (current_pos.x != target_pos.x) && checkEndstop( X_MIN_PIN, x_direction ); // added endstop check
@@ -362,13 +364,13 @@ void dda_move(long micro_delay)
 //-------------------------------------------------------------------
 inline void step_axes(bool x_needs_to_step, bool y_needs_to_step, bool z_needs_to_step){
 	if(!testrun){
-		if( x_needs_to_step) digitalWriteFast(X_STEP_PIN, HIGH);
-		if( y_needs_to_step) digitalWriteFast(Y_STEP_PIN, HIGH);
-		if( z_needs_to_step) digitalWriteFast(Z_STEP_PIN, HIGH);
+		if( x_needs_to_step) digitalWrite(X_STEP_PIN, HIGH);
+		if( y_needs_to_step) digitalWrite(Y_STEP_PIN, HIGH);
+		if( z_needs_to_step) digitalWrite(Z_STEP_PIN, HIGH);
 		delayMicroseconds(5); // A4988 needs at least 1micro second to register a step
-		if( x_needs_to_step) digitalWriteFast(X_STEP_PIN, LOW);
-		if( y_needs_to_step) digitalWriteFast(Y_STEP_PIN, LOW);
-		if( z_needs_to_step) digitalWriteFast(Z_STEP_PIN, LOW);
+		if( x_needs_to_step) digitalWrite(X_STEP_PIN, LOW);
+		if( y_needs_to_step) digitalWrite(Y_STEP_PIN, LOW);
+		if( z_needs_to_step) digitalWrite(Z_STEP_PIN, LOW);
 	}
 }
 
@@ -385,15 +387,6 @@ void set_target(long x, long y, long z)
 	target_pos.x = x;
 	target_pos.y = y;
 	target_pos.z = z;
-	
-#ifdef FULLDEBUG
-	SerialUSB.print("target: ");
-	SerialUSB.print(target_pos.x , DEC);
-	SerialUSB.print(", ");
-	SerialUSB.print(target_pos.y,DEC);
-	SerialUSB.print(", ");
-	SerialUSB.println(target_pos.z,DEC);
-#endif
 }
 
 
@@ -417,42 +410,30 @@ void set_position(long x, long y, long z )
 //-------------------------------------------------------------------
 void enable_steppers()
 {
-	digitalWriteFast(X_ENABLE_PIN, ENABLE_ON);
-	digitalWriteFast(Y_ENABLE_PIN, ENABLE_ON);
-	digitalWriteFast(Z_ENABLE_PIN, ENABLE_ON);
-#ifdef FULLDEBUG
-	SerialUSB.println("Enable steppers");
-#endif
+	digitalWrite(X_ENABLE_PIN, ENABLE_ON);
+	digitalWrite(Y_ENABLE_PIN, ENABLE_ON);
+	digitalWrite(Z_ENABLE_PIN, ENABLE_ON);
 }
 
 //-------------------------------------------------------------------
 void enable_z()
 {
-	digitalWriteFast(Z_ENABLE_PIN, ENABLE_ON);
-#ifdef FULLDEBUG
-	SerialUSB.println("Enable Z");
-#endif
+	digitalWrite(Z_ENABLE_PIN, ENABLE_ON);
 }
 
 
 //-------------------------------------------------------------------
 void disable_steppers()
 {
-	digitalWriteFast(X_ENABLE_PIN, !ENABLE_ON);
-	digitalWriteFast(Y_ENABLE_PIN, !ENABLE_ON);
-#ifdef FULLDEBUG
-	SerialUSB.println("Disable steppers");
-#endif
+	digitalWrite(X_ENABLE_PIN, !ENABLE_ON);
+	digitalWrite(Y_ENABLE_PIN, !ENABLE_ON);
 }
 
 
 //-------------------------------------------------------------------
 void disable_z()
 {
-	digitalWriteFast(Z_ENABLE_PIN, !ENABLE_ON);
-#ifdef FULLDEBUG
-	SerialUSB.println("Disable Z");
-#endif
+	digitalWrite(Z_ENABLE_PIN, !ENABLE_ON);
 }
 
 
@@ -477,29 +458,29 @@ void setMicroSteps(int _microSteps){
     /*
      switch (_microSteps) {
      case 1:
-     digitalWriteFast(MS1_PIN, LOW);
-     digitalWriteFast(MS2_PIN, LOW);
-     digitalWriteFast(MS3_PIN, LOW);
+     digitalWrite(MS1_PIN, LOW);
+     digitalWrite(MS2_PIN, LOW);
+     digitalWrite(MS3_PIN, LOW);
      break;
      case 2:
-     digitalWriteFast(MS1_PIN, HIGH);
-     digitalWriteFast(MS2_PIN, LOW);
-     digitalWriteFast(MS3_PIN, LOW);
+     digitalWrite(MS1_PIN, HIGH);
+     digitalWrite(MS2_PIN, LOW);
+     digitalWrite(MS3_PIN, LOW);
      break;
      case 4:
-     digitalWriteFast(MS1_PIN, LOW);
-     digitalWriteFast(MS2_PIN, HIGH);
-     digitalWriteFast(MS3_PIN, LOW);
+     digitalWrite(MS1_PIN, LOW);
+     digitalWrite(MS2_PIN, HIGH);
+     digitalWrite(MS3_PIN, LOW);
      break;
      case 8:
-     digitalWriteFast(MS1_PIN, HIGH);
-     digitalWriteFast(MS2_PIN, HIGH);
-     digitalWriteFast(MS3_PIN, LOW);
+     digitalWrite(MS1_PIN, HIGH);
+     digitalWrite(MS2_PIN, HIGH);
+     digitalWrite(MS3_PIN, LOW);
      break;
      case 16:
-     digitalWriteFast(MS1_PIN, HIGH);
-     digitalWriteFast(MS2_PIN, HIGH);
-     digitalWriteFast(MS3_PIN, HIGH);
+     digitalWrite(MS1_PIN, HIGH);
+     digitalWrite(MS2_PIN, HIGH);
+     digitalWrite(MS3_PIN, HIGH);
      break;
      default:
      SerialUSB.print(_microSteps);

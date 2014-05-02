@@ -39,7 +39,7 @@ float circleRes = 0.5f;						// circleResolution
 int state = WORKING;
 
 // DEBUG
-bool debug = false;                         // output debug statements
+int debug = 0;                              // set the debug level
 bool testrun = true;						// to check if I'm doing a testrun
 
 // SPEEDS
@@ -76,10 +76,6 @@ void setup(){
     
 	SerialUSB.println("Longhand Drawing Machine V2.2 awaiting commands");
 	SerialUSB.println("Send me \"?\\n\" for help");
-	
-#ifdef FULLDEBUG
-	SerialUSB.println("In FULLDEBUG mode");
-#endif
 	
 	getFileList();
 	state = WORKING;
@@ -122,16 +118,14 @@ void goHome(){
 }
 
 
-/*
- //------------------------------------------------------------
- void setHome(){
- // set the current position as 0,0,0
- // set_position(0, 0, 0);
- offSet.x = 0;
- offSet.y = 0;
- SerialUSB.println("Set new Offset position (x,y,z = 0,0,0 now)");
- }
- */
+//------------------------------------------------------------
+void setHome(){
+    // set the current position as 0,0,0
+    set_position(0, 0, 0);
+    offSet.x = 0;
+    offSet.y = 0;
+    SerialUSB.println("Set new Offset position (x,y,z = 0,0,0 now)");
+}
 
 //------------------------------------------------------------
 void moveTo(long x, long y){
@@ -140,7 +134,6 @@ void moveTo(long x, long y){
 
 //------------------------------------------------------------
 void moveTo(long x, long y, long z){
-	//*
     if( (x < 0 || y < 0 || z < 0  || z > 200) && !testrun){
 		// should only happen when setting the home position / doing relative moves
 		SerialUSB.print("Warning!! new target is ");
@@ -151,7 +144,6 @@ void moveTo(long x, long y, long z){
         SerialUSB.println(z , DEC);
 		return;
 	}
-    //*/
 	set_target(x, y, z);
 	dda_move(max_delay);
 }
@@ -164,28 +156,36 @@ void moveTo(long x, long y, long z){
 void printState(){
 	
 	SerialUSB.println(" Longhand V2.2 ");
+    if(debug > 1){
+        SerialUSB.println(" #####################");
+        SerialUSB.println(" ### in FULL DEBUG mode ### ");
+        SerialUSB.println(" #####################");
+    }
 	SerialUSB.println(" -- STATE -- ");
 	SerialUSB.print(" max delay (slow): ");
 	SerialUSB.println(max_delay);
+    
 	SerialUSB.print(" min delay (fast): ");
 	SerialUSB.println(min_delay);
+    
 	SerialUSB.print(" acceleration: ");
 	SerialUSB.println(acceleration);
+    
 	SerialUSB.print(" microSteps: ");
 	SerialUSB.println(microSteps);
+    
 	SerialUSB.print(" scale: ");
 	SerialUSB.println( scale );
+    
 	SerialUSB.print(" rotation: ");
 	SerialUSB.println( rotation );
 	// position
 	SerialUSB.print(" Position:    ");
 	SerialUSB.print(current_pos.x);
-	SerialUSB.print(" x, ");
+	SerialUSB.print(", ");
 	SerialUSB.print(current_pos.y);
-	SerialUSB.print(" y, ");
-	SerialUSB.print(current_pos.z);
-	SerialUSB.println(" z");
-	
+	SerialUSB.print(", ");
+	SerialUSB.println(current_pos.z);
 	SerialUSB.print(" Circle resolution (x10): ");
 	SerialUSB.println(10*circleRes);
 	
@@ -216,7 +216,7 @@ void printState(){
      
      SerialUSB.println("");
      SerialUSB.println(" - Settings");
-     SerialUSB.println(" d1 : set debug to 1 (on)");
+     SerialUSB.println(" d1 : set debug to 1 (level 1)");
      SerialUSB.println(" t1 : set testrun to 1 (the machine will not move the steppers");
      SerialUSB.println(" r10 : set circle resolution to 10degrees / part");
      SerialUSB.println(" x50 : set scale to 50%");
@@ -244,4 +244,7 @@ void printPos(long x, long y, long z){
 	SerialUSB.print(" ");
 	SerialUSB.println(z);
 	delayMicroseconds(5);
+    if(testrun){
+        delay(1);
+    }
 }

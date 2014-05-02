@@ -14,26 +14,26 @@ float lVals[MAX_PARSE_VALUES];	// long values
  * a	Arc
  * b	Bezier
  * c	Callibrate (find home)
- * d	Debug
+ * d	Debug       : set debug level
  * e	Ellipse
- * f	Files
+ * f	Files       : display a list of files
  * g
  * h	Home
  * i	bezierResolution
  * j
- * k    Kill : delete all files
+ * k    Kill        : delete a file
  * l	Lineto
  * m	Moveto
  * n
- * o	Origin : set as origin
- * p	draw
+ * o	Origin      : set as origin
+ * p	Print       : draw a file
  * q
  * r	CircleRes
  * s	Speeds (delays)
  * t	Testrun
  * u	Microsteps
- * v    v = rotated (180)
- * w	WriteToFile
+ * v    v : rotation (0,1,2,3 times 90 degrees)
+ * w	Write to file
  * x	X times : scale
  * y
  * z    Enable/disable z axis
@@ -91,20 +91,27 @@ void parseMessage(char* input, int length){
         case 'M':	// Relative move to
             parseRelativeMoveTo(&input[1], length-1);
             break;
-        /*
+            
         case 'o':
         case 'O':	// set origin
             setHome();
             break;
-        */
             
             // SETTINGS
             
         case 'd':
-        case 'D':	// toggle debug statements on / off
+        case 'D':	// toggle debug statements off / on / A LOT
             debug = value;
-            if(debug){
-                SerialUSB.println("Debug is ON");
+            switch(debug){
+                case 0:
+                    SerialUSB.println("Debug is OFF");
+                    break;
+                case 1:
+                    SerialUSB.println("Debug is ON");
+                    break;
+                case 2:
+                    SerialUSB.println("Debug is ON HIGH ALERT");
+                    break;
             }
             break;
             
@@ -191,7 +198,7 @@ void parseMessage(char* input, int length){
             
         case 'k':
         case 'K': // kill : delete all files!
-            deleteAllFiles();
+            deleteFile(&input[1], length -1);
             getFileList();
             break;
             
@@ -335,13 +342,13 @@ void parseMoveTo(char* mssg, int length){
             moveTo(offSet.x + scale * lVals[0], offSet.y + scale * lVals[1], 100);
             break;
         case 1:
-            moveTo(offSet.x + scale * lVals[1] , offSet.y-scale * lVals[0] , 100);
+            moveTo(offSet.x - scale * lVals[1] , offSet.y+scale * lVals[0] , 100);
             break;
-        case 2:
+        case 2: // 180
             moveTo(offSet.x -scale * lVals[0], offSet.y -scale * lVals[1], 100);
             break;
         case 3:
-            moveTo(offSet.x - scale * lVals[1] , offSet.y+scale * lVals[0] , 100);
+            moveTo(offSet.x + scale * lVals[1] , offSet.y-scale * lVals[0] , 100);
             break;
     }
 }
@@ -374,31 +381,33 @@ void parseLineTo(char* mssg, int length){
                 moveTo(offSet.x + scale * lVals[0], offSet.y + scale * lVals[1], scale * lVals[2]);
                 break;
             case 1:
-                moveTo(offSet.x + scale * lVals[1] , offSet.y-scale * lVals[0] , scale * lVals[2]);
+                moveTo(offSet.x - scale * lVals[1] , offSet.y+scale * lVals[0] , scale * lVals[2]);
                 break;
-            case 2:
+            case 2://180
                 moveTo(offSet.x -scale * lVals[0], offSet.y -scale * lVals[1], scale * lVals[2]);
                 break;
             case 3:
-                moveTo(offSet.x - scale * lVals[1] , offSet.y+scale * lVals[0] , scale * lVals[2]);
+                moveTo(offSet.x + scale * lVals[1] , offSet.y-scale * lVals[0] , scale * lVals[2]);
                 break;
         }
     }
     else if(valnum == 2){
-        moveTo(current_pos.x, current_pos.y, 0);
+        if(current_pos.z != 0){
+            moveTo(current_pos.x, current_pos.y, 0);
+        }
         switch (rotation) {
             case 0:
             default:
                 moveTo(offSet.x + scale * lVals[0], offSet.y + scale * lVals[1], 0);
                 break;
             case 1:
-                moveTo(offSet.x + scale * lVals[1] , offSet.y-scale * lVals[0] , 0);
+                moveTo(offSet.x - scale * lVals[1] , offSet.y+scale * lVals[0] , 0);
                 break;
-            case 2:
+            case 2://180
                 moveTo(offSet.x -scale * lVals[0], offSet.y -scale * lVals[1], 0);
                 break;
             case 3:
-                moveTo(offSet.x - scale * lVals[1] , offSet.y+scale * lVals[0] , 0);
+                moveTo(offSet.x + scale * lVals[1] , offSet.y-scale * lVals[0] , 0);
                 break;
         }
     }

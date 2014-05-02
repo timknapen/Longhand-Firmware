@@ -48,35 +48,19 @@ void getFileList(){ //print out all the .LHD files on the SD card
 }
 
 //----------------------------------------------------------------------
-void deleteAllFiles(){
+void deleteFile(char * filename, int length){
     
     init_SD();
 	root = SD.open("/");
 	root.rewindDirectory();
-	SerialUSB.println("DELETE Files:");
-	while(true) {
-		File entry =  root.openNextFile();
-		if (!entry) {
-			break;
-		}
-		if (!entry.isDirectory()) {
-			// do some more checking
-			char* filename = entry.name();
-			if(filename[0] == '~' || filename[0] == '.' || filename[0] == '_'){
-				entry.close();
-				continue;
-			}
-			if(!hasExtension(entry, ".LHD")){
-				entry.close();
-				continue;
-			}
-			// if we are here
-			SerialUSB.print(" delete ");
-			SerialUSB.println(filename);
-            SD.remove(filename);
-		}
-		entry.close();
-	}
+	
+	if(SD.remove(filename)){
+        SerialUSB.print("DELETED ");
+        SerialUSB.println(filename);
+    }else{
+        SerialUSB.print("FAILED to delete ");
+        SerialUSB.println(filename);
+    }
 	if(root){
 		root.close();
 	}
