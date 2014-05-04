@@ -78,8 +78,10 @@ void drawFromSD(char * filename, int length){ // start the draw from SD
 		SerialUSB.print("Starting to parse ");
 		SerialUSB.println(file.name());
 		
+        isDrawing = true;
 		parseFileContents(file);
-		
+		isDrawing = false;
+        
 		SerialUSB.println(" --- done parsing (disable steppers)");
 		SerialUSB.println(MACHINE_STOPPED); // c0 = ended drawing, a command the controller software understands
 		file.close();

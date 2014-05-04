@@ -87,9 +87,8 @@ void parseMessage(char* input, int length){
             break;
             
         case 'm':	// Move to
+        case 'M':
             parseMoveTo(&input[1], length-1);
-        case 'M':	// Relative move to
-            parseRelativeMoveTo(&input[1], length-1);
             break;
             
         case 'o':
@@ -331,86 +330,78 @@ void parseEllipse(char* mssg, int length){
 void parseMoveTo(char* mssg, int length){
     int valnum =  parseLongs(mssg, length);
     if(valnum < 2) return;
-    if( current_pos.x == scale * lVals[0] && current_pos.y == scale * lVals[1]){
+    long x = lVals[0];
+    long y = lVals[1];
+   
+    if(isDrawing){ // only scale and rotate when drawing from file
+       
+        switch (rotation) {
+            case 1: // 90
+                x = - lVals[1];
+                y = lVals[0];
+                break;
+            case 2: // 180
+                x = - lVals[0];
+                y = - lVals[1];
+                break;
+            case 3: // 270
+                x = lVals[1];
+                y = - lVals[0];
+                break;
+        }
+        
+        x *= scale;
+        y *= scale;
+        
+    }
+
+    if( current_pos.x == x && current_pos.y == y){
         // it's a useless move to!
         return;
     }
     moveTo(current_pos.x, current_pos.y, 100); // brush up at current position
-    switch (rotation) {
-        case 0:
-        default:
-            moveTo(offSet.x + scale * lVals[0], offSet.y + scale * lVals[1], 100);
-            break;
-        case 1:
-            moveTo(offSet.x - scale * lVals[1] , offSet.y+scale * lVals[0] , 100);
-            break;
-        case 2: // 180
-            moveTo(offSet.x -scale * lVals[0], offSet.y -scale * lVals[1], 100);
-            break;
-        case 3:
-            moveTo(offSet.x + scale * lVals[1] , offSet.y-scale * lVals[0] , 100);
-            break;
-    }
+    moveTo(offSet.x + x, offSet.y + y, 100);
 }
 
-
-//------------------------------------------------------------
-void parseRelativeMoveTo(char* mssg, int length){
-    int valnum =  parseLongs(mssg, length);
-    if(valnum < 3 ) return;
-    if(rotation == 2){
-        moveTo(current_pos.x + -scale * lVals[0],
-               current_pos.y + -scale * lVals[1],
-               current_pos.z + scale * lVals[2]);
-    }else{
-        moveTo(current_pos.x + scale * lVals[0],
-               current_pos.y + scale * lVals[1],
-               current_pos.z + scale * lVals[2]);
-    }
-    
-}
 
 //------------------------------------------------------------
 void parseLineTo(char* mssg, int length){
     int valnum =  parseLongs(mssg, length);
-    if(valnum >= 3){ // with z
-        moveTo(current_pos.x, current_pos.y, scale * lVals[2]);
-        switch (rotation) {
-            case 0:
-            default:
-                moveTo(offSet.x + scale * lVals[0], offSet.y + scale * lVals[1], scale * lVals[2]);
-                break;
-            case 1:
-                moveTo(offSet.x - scale * lVals[1] , offSet.y+scale * lVals[0] , scale * lVals[2]);
-                break;
-            case 2://180
-                moveTo(offSet.x -scale * lVals[0], offSet.y -scale * lVals[1], scale * lVals[2]);
-                break;
-            case 3:
-                moveTo(offSet.x + scale * lVals[1] , offSet.y-scale * lVals[0] , scale * lVals[2]);
-                break;
-        }
+    if(valnum < 2) return;
+    long x = lVals[0];
+    long y = lVals[1];
+    long z = 0;
+    if(valnum < 3){ // z was not set, so use 0
+        lVals[2] = 0;
     }
-    else if(valnum == 2){
-        if(current_pos.z != 0){
-            moveTo(current_pos.x, current_pos.y, 0);
-        }
+    
+    if(isDrawing){ // only scale and rotate when drawing from file
+        
         switch (rotation) {
-            case 0:
-            default:
-                moveTo(offSet.x + scale * lVals[0], offSet.y + scale * lVals[1], 0);
+            case 1: // 90
+                x = - lVals[1];
+                y = lVals[0];
                 break;
-            case 1:
-                moveTo(offSet.x - scale * lVals[1] , offSet.y+scale * lVals[0] , 0);
+            case 2: // 180
+                x = - lVals[0];
+                y = - lVals[1];
                 break;
-            case 2://180
-                moveTo(offSet.x -scale * lVals[0], offSet.y -scale * lVals[1], 0);
-                break;
-            case 3:
-                moveTo(offSet.x + scale * lVals[1] , offSet.y-scale * lVals[0] , 0);
+            case 3: // 270
+                x = lVals[1];
+                y = - lVals[0];
                 break;
         }
+        
+        x *= scale;
+        y *= scale;
+        
     }
+    
+    if(current_pos.z != z){
+        moveTo(current_pos.x, current_pos.y, z);
+    }
+    
+    moveTo(offSet.x + x, offSet.y + y, z);
 }
 
 

@@ -6,7 +6,7 @@
 #include "Arduino.h"
 
 /*------------------------------------------------------------
-
+ 
  LONGHAND DRAWING MACHINE firmware V2.2
  
  last update 02/05/2014
@@ -30,7 +30,7 @@
 #endif
 
 // SERIAL
-//#define BAUD 115200			// serialUSB doesn't need a baud rate !
+//#define BAUD 115200                       // serialUSB doesn't need a baud rate !
 #define bufferLength 64                     // serial buffer length
 char serialBuffer[bufferLength];            // serial buffer
 int iSerialBuf = 0;							// position in the serialBuffer
@@ -65,9 +65,10 @@ LongPoint target_pos;						// targent position in steps
 LongPoint delta_steps;						// the distances on each axis
 LongPoint offSet;
 
-// scale existing drawings to new stepper resolutions
-int scale = 1;
-int rotation = 0; // in 90° : 1 = 90, 2 = 180, 3 = -90
+// scale existing drawings, but only when drawing from file!
+bool isDrawing = false;                     // are we drawing from a file?
+int scale = 1;                              // scale factor
+int rotation = 0;                           // in 90° : 1 = 90, 2 = 180, 3 = -90
 
 //------------------------------------------------------------
 void setup(){
