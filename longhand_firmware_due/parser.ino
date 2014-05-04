@@ -87,8 +87,10 @@ void parseMessage(char* input, int length){
             break;
             
         case 'm':	// Move to
-        case 'M':
             parseMoveTo(&input[1], length-1);
+            break;
+        case 'M':	// Relative move to
+            parseRelativeMoveTo(&input[1], length-1);
             break;
             
         case 'o':
@@ -363,6 +365,41 @@ void parseMoveTo(char* mssg, int length){
     moveTo(offSet.x + x, offSet.y + y, 100);
 }
 
+
+//------------------------------------------------------------
+void parseRelativeMoveTo(char* mssg, int length){
+    int valnum =  parseLongs(mssg, length);
+    if(valnum < 2) return;
+    long x = lVals[0];
+    long y = lVals[1];
+    long z = 0;
+    if(valnum < 3){ // z was not set, so use 0
+        lVals[2] = 0;
+    }
+    
+    if(isDrawing){ // only scale and rotate when drawing from file
+        
+        switch (rotation) {
+            case 1: // 90
+                x = - lVals[1];
+                y = lVals[0];
+                break;
+            case 2: // 180
+                x = - lVals[0];
+                y = - lVals[1];
+                break;
+            case 3: // 270
+                x = lVals[1];
+                y = - lVals[0];
+                break;
+        }
+        
+        x *= scale;
+        y *= scale;
+        
+    }
+    moveTo(current_pos.x + x, current_pos.y + y, current_pos.z + z);
+}
 
 //------------------------------------------------------------
 void parseLineTo(char* mssg, int length){
