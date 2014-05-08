@@ -5,10 +5,11 @@
  * Arduino DUE pin assignment
  * 
  * These are the pins for Longhand Controller PCB V1
+ * They also work with the Arduino WiFiShield, when testing SD reads etc.
  *
  ****************************************************************************************/
 
-
+// SC CARD (works for Longhand Controller PCB V1 and Arduino WiFiShield)
 #define CSPIN 4
 
 // X STEPPER

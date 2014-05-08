@@ -4,13 +4,13 @@
 // commands to send back to the controller software
 #define	MACHINE_STOPPED "_c0"
 
-#define INVERT_X_DIR     1
-#define INVERT_Y_DIR     1
-#define INVERT_Z_DIR     1
+#define INVERT_X_DIR     1      // is the direction of the X axis inverted?
+#define INVERT_Y_DIR     1      // is the direction of the Y axis inverted?
+#define INVERT_Z_DIR     1      // http://youtu.be/EPIPLahykrI?t=1m48s
 
 
 
-// Set to one if enable pins are inverting
+// Set to 1 if enable pins are inverting
 // inverting = active low
 
 #define INVERT_ENABLE_PINS 1

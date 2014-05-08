@@ -9,7 +9,7 @@
  
  LONGHAND DRAWING MACHINE firmware V2.2
  
- last update 02/05/2014
+ last update 08/05/2014
  by Tim Knapen
  http://www.longhand.cc/
  
@@ -18,7 +18,7 @@
  + Longhand PCB V1
  + 4 Pololu A4988 stepper motor driver carriers
  
- Compiled and tested with IDE
+ Compiled and tested with
  - Arduino 1.5.2
  - Arduino 1.5.6-r2
  
@@ -30,7 +30,6 @@
 #endif
 
 // SERIAL
-//#define BAUD 115200                       // serialUSB doesn't need a baud rate !
 #define bufferLength 64                     // serial buffer length
 char serialBuffer[bufferLength];            // serial buffer
 int iSerialBuf = 0;							// position in the serialBuffer
@@ -57,7 +56,7 @@ int acceleration = 10;						// gets added each step to the delay to calculate th
 int microSteps = 8;							// the type of microsteps we are taking, default is 1/8th step
 
 // DISTANCE (keep track of how long a print will take)
-long travelDistance = 0;
+unsigned long travelDistance = 0L;
 
 // POSITIONS (for steppers)
 LongPoint current_pos;						// current position in steps
@@ -66,30 +65,22 @@ LongPoint delta_steps;						// the distances on each axis
 LongPoint offSet;
 
 // scale existing drawings, but only when drawing from file!
-bool isDrawing = false;                     // are we drawing from a file?
+bool isDrawingFromFile = false;             // are we drawing from a file?
 int scale = 1;                              // scale factor
 int rotation = 0;                           // in 90° : 1 = 90, 2 = 180, 3 = -90
 
 //------------------------------------------------------------
 void setup(){
-	pinMode(9, OUTPUT);		// I'm using the WifiShield for the microSD card reader it has
-	digitalWrite(9, HIGH);	// switch on the LED on the wifiShield
-	while(!SerialUSB); // wait for the serialUSB to come up
-    
-    /* TEST **/
-    
-    /* **/
-	//other initialization.
-	init_steppers();
-    
-	SerialUSB.println("Longhand Drawing Machine V2.2 awaiting commands");
+    while(!SerialUSB);      // wait for the serialUSB to come up
+    delay(100);
+    SerialUSB.println("Longhand Drawing Machine V2.3 awaiting commands");
 	SerialUSB.println("Send me \"?\\n\" for help");
-	
-	getFileList();
-	state = WORKING;
+   
+	//other initialization.
+    state = WORKING;
+    init_steppers();
 	disable_steppers();
 	
-	digitalWrite(9, LOW);
 }
 
 //------------------------------------------------------------
@@ -132,7 +123,7 @@ void setHome(){
     set_position(0, 0, 0);
     offSet.x = 0;
     offSet.y = 0;
-    SerialUSB.println("Set new Offset position (x,y,z = 0,0,0 now)");
+    SerialUSB.println("Set new home position (x,y,z = 0,0,0 now)");
 }
 
 //------------------------------------------------------------
@@ -152,6 +143,11 @@ void moveTo(long x, long y, long z){
         SerialUSB.println(z , DEC);
 		return;
 	}
+    if( testrun ){
+        // calculate the distance
+        travelDistance += (unsigned long) sqrt( (x - current_pos.x) * (x - current_pos.x) +
+                                                (y - current_pos.y) * (y - current_pos.y));
+    }
 	set_target(x, y, z);
 	dda_move(max_delay);
 }
@@ -163,6 +159,7 @@ void moveTo(long x, long y, long z){
 //------------------------------------------------------------
 void printState(){
 	
+    SerialUSB.println();
 	SerialUSB.println(" Longhand V2.2 ");
     if(debug > 1){
         SerialUSB.println(" #####################");
@@ -234,7 +231,7 @@ void printState(){
      SerialUSB.println("");
      SerialUSB.println(" - Read Write Files");
      SerialUSB.println(" f : print the list of  .lhd files on the SD card");
-     SerialUSB.println(" k : kill all files on SD card");
+     SerialUSB.println(" kFilename.lhd : delete Filename.lhd from the SD card");
      SerialUSB.println(" pFilename.lhd : start drawing from the file myfile.lhd on the SD card");
      SerialUSB.println(" wFilename.lhd : start writing from serial to Filename.lhd on SD, \\r (car. return) to end writing");
      SerialUSB.println("");
@@ -253,6 +250,6 @@ void printPos(long x, long y, long z){
 	SerialUSB.println(z);
 	delayMicroseconds(5);
     if(testrun){
-        delay(1);
+        delay(1); // trying the to squash the mangled feedback bug
     }
 }

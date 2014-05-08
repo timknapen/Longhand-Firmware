@@ -78,11 +78,16 @@ void drawFromSD(char * filename, int length){ // start the draw from SD
 		SerialUSB.print("Starting to parse ");
 		SerialUSB.println(file.name());
 		
-        isDrawing = true;
+        isDrawingFromFile = true;
+        travelDistance = 0L;
 		parseFileContents(file);
-		isDrawing = false;
+		isDrawingFromFile = false;
         
 		SerialUSB.println(" --- done parsing (disable steppers)");
+        if(testrun){
+            SerialUSB.println(" --- travel distance : ");
+            SerialUSB.println(travelDistance);
+        }
 		SerialUSB.println(MACHINE_STOPPED); // c0 = ended drawing, a command the controller software understands
 		file.close();
 		disable_steppers();
@@ -124,7 +129,7 @@ void parseFileContents(File file){
 	SerialUSB.print("\tParsing file: ");
 	SerialUSB.println(file.name());
 	SerialUSB.println();
-	char buf[256];
+	char buf[bufferLength];
 	int i = 0;
 	
 	// remember where the pen was in the real world
@@ -147,7 +152,7 @@ void parseFileContents(File file){
 				break; // break out of while loop?
 			}
 			char c =  file.read();
-			if( i < 256-1){
+			if( i < bufferLength){
 				switch (c){
 					case '\n':
 						buf[i] = '\0';  // end string
@@ -174,7 +179,7 @@ void parseFileContents(File file){
 				}
 			}
 			else{
-				SerialUSB.println("ERROR line is bigger than buffer! (BAD READ)");
+				SerialUSB.println("ERROR buffer is full! (BAD READ)");
 				delay(20);
 				i = 0;
 				break;

@@ -18,12 +18,12 @@ float lVals[MAX_PARSE_VALUES];	// long values
  * e	Ellipse
  * f	Files       : display a list of files
  * g
- * h	Home
+ * h	Home        : go to home position (0,0)
  * i	bezierResolution
  * j
  * k    Kill        : delete a file
- * l	Lineto
- * m	Moveto
+ * l	Lineto      : put the pen down and go to position (x,y)
+ * m	Moveto      : move the pen to position (x,y,z)
  * n
  * o	Origin      : set as origin
  * p	Print       : draw a file
@@ -34,7 +34,7 @@ float lVals[MAX_PARSE_VALUES];	// long values
  * u	Microsteps
  * v    v : rotation (0,1,2,3 times 90 degrees)
  * w	Write to file
- * x	X times : scale
+ * x	X times : scale the drawing from file
  * y
  * z    Enable/disable z axis
  *
@@ -146,10 +146,10 @@ void parseMessage(char* input, int length){
             testrun = value;
             if(debug){
                 if(testrun){
-                    SerialUSB.println("machine is doing testruns");
+                    SerialUSB.println("Machine is in preview mode");
                 }
                 else{
-                    SerialUSB.println("machine is drawing");
+                    SerialUSB.println("Machine is in active mode");
                 }
             }
             break;
@@ -157,33 +157,33 @@ void parseMessage(char* input, int length){
         case 'u':
         case 'U':
             setMicroSteps(value);
-            SerialUSB.print("microsteps set to 1/");
+            SerialUSB.print("Microsteps set to 1/");
             SerialUSB.println(value);
             break;
             
         case 'x':
         case 'X':	// set scale
             scale = value;
-            SerialUSB.print("scale is ");
+            SerialUSB.print("Scale is ");
             SerialUSB.println(scale);
             break;
             
         case 'v':
         case 'V':	// set rotation
             rotation = value;
-            SerialUSB.print("rotation is ");
+            SerialUSB.print("Rotation is ");
             switch (rotation) {
                 case 0:
                     SerialUSB.println("Up");
                     break;
                 case 1:
-                    SerialUSB.println("Left");
+                    SerialUSB.println("Right");
                     break;
                 case 2:
                     SerialUSB.println("Down");
                     break;
                 case 3:
-                    SerialUSB.println("Right");
+                    SerialUSB.println("Left");
                     break;
                 default:
                     break;
@@ -198,7 +198,9 @@ void parseMessage(char* input, int length){
             break;
             
         case 'k':
-        case 'K': // kill : delete all files!
+        case 'K':
+            // kill : delete a file!
+            // the rest of the command should be the filename
             deleteFile(&input[1], length -1);
             getFileList();
             break;
@@ -243,7 +245,7 @@ void parseMessage(char* input, int length){
 int parseLongs(char * input, int length){
     // parses the char * input with length
     // looks for comma separated longs
-    // puts them in lVals and returns how many integers were found.
+    // puts them in lVals and returns how many longs were found.
     int v = 0; // counter for values
     char c;
     if(length < 1) return 0;
@@ -335,7 +337,7 @@ void parseMoveTo(char* mssg, int length){
     long x = lVals[0];
     long y = lVals[1];
    
-    if(isDrawing){ // only scale and rotate when drawing from file
+    if(isDrawingFromFile){ // only scale and rotate when drawing from file
        
         switch (rotation) {
             case 1: // 90
@@ -377,7 +379,7 @@ void parseRelativeMoveTo(char* mssg, int length){
         lVals[2] = 0;
     }
     
-    if(isDrawing){ // only scale and rotate when drawing from file
+    if(isDrawingFromFile){ // only scale and rotate when drawing from file
         
         switch (rotation) {
             case 1: // 90
@@ -412,7 +414,7 @@ void parseLineTo(char* mssg, int length){
         lVals[2] = 0;
     }
     
-    if(isDrawing){ // only scale and rotate when drawing from file
+    if(isDrawingFromFile){ // only scale and rotate when drawing from file
         
         switch (rotation) {
             case 1: // 90

@@ -98,7 +98,6 @@ void writeFromSerial(){
 				numbyteswritten += iSerialBuf;
 				iSerialBuf = 0;
                 
-                // THE WRITE ERROR HAPPENED HERE!!
                 // add the character to buffer for the next write!
                 serialBuffer[iSerialBuf] = inByte;
 				iSerialBuf++;

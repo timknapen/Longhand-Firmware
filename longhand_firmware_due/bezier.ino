@@ -1,3 +1,4 @@
+
 //--------------------------------------------------------------
 void bezier(long x0, long y0, long x1, long y1, long x2, long y2, long x3, long y3){
 	// from OpenFrameworks' bezier interpolation
@@ -96,8 +97,8 @@ void arc(float xc, float yc, float r, float beginAngle, float endAngle){
 	// rotMatrix
 	// [ a b ]
 	// [ c d ]
-	// r_T = [cos(phi) -sin(phi);
-	//        sin(phi)  cos(phi] * r ;
+	// r_T = [ cos(phi) -sin(phi) ]
+	//       [ sin(phi)  cos(phi) ] * r
 	// applying rotation:
 	//  x = x1 * Math.Cos(angleStep) - y1 * Math.Sin(angleStep);
 	//  y = y1 * Math.Cos(angleStep) + x1 * Math.Sin(angleStep);
