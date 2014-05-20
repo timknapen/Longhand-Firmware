@@ -162,7 +162,7 @@ void findHome(){
         }
         else
         {
-            delayMicrosecondsInterruptible(current_delay);
+            delayMicroseconds(current_delay);
         }
 
 		printPos(current_pos.x, current_pos.y, current_pos.z);
@@ -171,11 +171,11 @@ void findHome(){
 		y_can_step = checkEndstop( Y_MIN_PIN, y_direction );
 		
 		if(SerialUSB.available() > 0) {
-			SerialUSB.println("\n calibration stopped by user");
+			println("\n calibration stopped by user");
 			break; // break out of while loop
 		}
 	}
-	SerialUSB.println(MACHINE_STOPPED);
+	println(MACHINE_STOPPED);
 	set_position(0,0, current_pos.z);
 	disable_steppers();
 }
@@ -244,18 +244,18 @@ void dda_move(long micro_delay)
     
 	if(max_delta == 0){ // no move, do nothing
 		if(debug > 1){
-			SerialUSB.println("dda_move 0 distance!:");
-            SerialUSB.print(current_pos.x);
-            SerialUSB.print(",");
-            SerialUSB.print(current_pos.y);
-            SerialUSB.print(",");
-            SerialUSB.print(current_pos.z);
-            SerialUSB.print(" delta: ");
-            SerialUSB.print(delta_steps.x);
-            SerialUSB.print(",");
-            SerialUSB.print(delta_steps.y);
-            SerialUSB.print(",");
-            SerialUSB.println(delta_steps.z);
+			println("dda_move 0 distance!:");
+            print(current_pos.x);
+            print(",");
+            print(current_pos.y);
+            print(",");
+            print(current_pos.z);
+            print(" delta: ");
+            print(delta_steps.x);
+            print(",");
+            print(delta_steps.y);
+            print(",");
+            println(delta_steps.z);
 		}
 		return;
 	}
@@ -329,7 +329,7 @@ void dda_move(long micro_delay)
 			}
 			else
 			{
-				delayMicrosecondsInterruptible(current_delay);
+				delayMicroseconds(current_delay);
 			}
 		}
 		// now I should have done a step and should be able to print out the position
@@ -348,7 +348,7 @@ void dda_move(long micro_delay)
 	if( (current_pos.x != target_pos.x ||
         current_pos.y != target_pos.y ||
         current_pos.z != target_pos.z ) && !testrun){
-		SerialUSB.println("ERROR - the dda move didn't finish properly");
+		println("ERROR - the dda move didn't finish properly");
 	}
 	current_pos.x = target_pos.x;
 	current_pos.y = target_pos.y;
@@ -438,15 +438,8 @@ void disable_z()
 
 
 //-------------------------------------------------------------------
-void delayMicrosecondsInterruptible(unsigned int us)
-{
-	delayMicroseconds(us);
-}
-
-
-//-------------------------------------------------------------------
 void setMicroSteps(int _microSteps){
-	SerialUSB.println(" microsteps are set by jumper");
+	println(" microsteps are set by jumper");
 	// MICROSTEPS
 	//	MS1		MS2		MS3
 	//	0		0		0	1
@@ -483,8 +476,8 @@ void setMicroSteps(int _microSteps){
      digitalWrite(MS3_PIN, HIGH);
      break;
      default:
-     SerialUSB.print(_microSteps);
-     SerialUSB.println(" is not a correct microstep setting");
+     print(_microSteps);
+     println(" is not a correct microstep setting");
      return;
      break;
      }

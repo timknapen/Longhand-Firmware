@@ -30,19 +30,19 @@ void startWritingToFile( char * filename, int length){
             filename[i]= '_';
         }
     }
-    SerialUSB.print(" Writing to ");
-    SerialUSB.println(filename);
+    print(" Writing to ");
+    println(filename);
 	
     // close the write file if it's still open ( shouldn't happen )
 	if(writeFile){
-        SerialUSB.println(" WARNING : writefile was still open ");
+        println(" WARNING : writefile was still open ");
 		writeFile.close();
 	}
     
 	SD.remove(filename);
 	writeFile = SD.open(filename, FILE_WRITE);
     if(!writeFile){
-        SerialUSB.println(" ERROR couldn't open file to write ");
+        println(" ERROR couldn't open file to write ");
         return;
     }
 	numbyteswritten = 0;
@@ -56,7 +56,7 @@ void stopWriting(){
 		writeFile.write((const uint8_t *) serialBuffer, iSerialBuf);
 		numbyteswritten += iSerialBuf;
 		iSerialBuf = 0;
-        SerialUSB.println(" WARNING : Needed final write!! ");
+        println(" WARNING : Needed final write!! ");
 	}
     
     // close the file.
@@ -67,9 +67,9 @@ void stopWriting(){
         root.close();
     }
     
-	SerialUSB.print("Done writing ");
-	SerialUSB.print(numbyteswritten);
-	SerialUSB.println(" bytes to file");
+	print("Done writing ");
+	print(numbyteswritten);
+	println(" bytes to file");
     getFileList();
 }
 

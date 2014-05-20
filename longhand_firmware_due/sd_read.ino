@@ -8,7 +8,7 @@ File root;
 void init_SD(){
 	pinMode(CSPIN, OUTPUT);
 	if (!SD.begin(CSPIN)) {
-		//SerialUSB.println(" SD initialization failed!");
+		//println(" SD initialization failed!");
 		return;
 	}
 }
@@ -18,7 +18,7 @@ void getFileList(){ //print out all the .LHD files on the SD card
 	init_SD();
 	root = SD.open("/");
 	root.rewindDirectory();
-	SerialUSB.println("Files:");
+	println("Files:");
 	while(true) {
 		File entry =  root.openNextFile();
 		if (!entry) {
@@ -36,8 +36,8 @@ void getFileList(){ //print out all the .LHD files on the SD card
 				continue;
 			}
 			// if we are here, we have a good file, so print it
-			SerialUSB.print("_f");
-			SerialUSB.println(entry.name());
+			print("_f");
+			println(entry.name());
             delayMicroseconds(5);
 		}
 		entry.close();
@@ -55,11 +55,11 @@ void deleteFile(char * filename, int length){
 	root.rewindDirectory();
 	
 	if(SD.remove(filename)){
-        SerialUSB.print("DELETED ");
-        SerialUSB.println(filename);
+        print("DELETED ");
+        println(filename);
     }else{
-        SerialUSB.print("FAILED to delete ");
-        SerialUSB.println(filename);
+        print("FAILED to delete ");
+        println(filename);
     }
 	if(root){
 		root.close();
@@ -75,25 +75,25 @@ void drawFromSD(char * filename, int length){ // start the draw from SD
 	File file = SD.open(filename);
 	
 	if(file){
-		SerialUSB.print("Starting to parse ");
-		SerialUSB.println(file.name());
+		print("Starting to parse ");
+		println(file.name());
 		
         isDrawingFromFile = true;
         travelDistance = 0L;
 		parseFileContents(file);
 		isDrawingFromFile = false;
         
-		SerialUSB.println(" --- done parsing (disable steppers)");
+		println(" --- done parsing (disable steppers)");
         if(testrun){
-            SerialUSB.println(" --- travel distance : ");
-            SerialUSB.println(travelDistance);
+            println(" --- travel distance : ");
+            println(travelDistance);
         }
-		SerialUSB.println(MACHINE_STOPPED); // c0 = ended drawing, a command the controller software understands
+		println(MACHINE_STOPPED); // c0 = ended drawing, a command the controller software understands
 		file.close();
 		disable_steppers();
 	}else{
-		SerialUSB.print("I couldn't find the file ");
-		SerialUSB.println(filename);
+		print("I couldn't find the file ");
+		println(filename);
 	}
 }
 
@@ -107,7 +107,7 @@ bool hasExtension(File file, char* ext){
 		char c = file.name()[namelen];
 		if(c == '\0') break;
 		if(namelen > 13){ // should NEVER happen, is just a safety
-			SerialUSB.println("ERROR the filename is too long, should only be 13 chars long (see SD.h)");
+			println("ERROR the filename is too long, should only be 13 chars long (see SD.h)");
 			break;
 		}
 		namelen++;
@@ -126,9 +126,9 @@ bool hasExtension(File file, char* ext){
 //----------------------------------------------------------------------
 void parseFileContents(File file){
 	
-	SerialUSB.print("\tParsing file: ");
-	SerialUSB.println(file.name());
-	SerialUSB.println();
+	print("\tParsing file: ");
+	println(file.name());
+	println();
 	char buf[bufferLength];
 	int i = 0;
 	
@@ -147,7 +147,7 @@ void parseFileContents(File file){
 		while(file.available()){
 			// check serial to see if I have to stop
 			if(SerialUSB.available() > 0) {
-				SerialUSB.println("\n Drawing stopped by user");
+				println("\n Drawing stopped by user");
 				disable_steppers();
 				break; // break out of while loop?
 			}
@@ -179,8 +179,7 @@ void parseFileContents(File file){
 				}
 			}
 			else{
-				SerialUSB.println("ERROR buffer is full! (BAD READ)");
-				delay(20);
+				println("ERROR buffer is full! (BAD READ)");
 				i = 0;
 				break;
 			}
@@ -196,6 +195,6 @@ void parseFileContents(File file){
         offSet.x = 0;
         offSet.y = 0;
 	}else{
-		SerialUSB.println("parseFileContents got passed a bad file");
+		println("parseFileContents got passed a bad file");
 	}
 }

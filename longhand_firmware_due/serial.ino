@@ -1,4 +1,3 @@
-
 //------------------------------------------------------------
 void checkSerial(){
     while (SerialUSB.available() > 0){
@@ -14,15 +13,13 @@ void checkSerial(){
                     serialBuffer[iSerialBuf] = inByte;
                     iSerialBuf++;
                 }else{
-                    SerialUSB.println("ERROR : SERIAL BUFFER OVERFLOW!");
+                    println("ERROR : SERIAL BUFFER OVERFLOW!");
                     iSerialBuf = 0; // we'll just throw away what we had?
                 }
                 break;
         }
 	}
 }
-
-
 
 
 

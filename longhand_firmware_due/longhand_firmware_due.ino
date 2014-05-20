@@ -5,11 +5,12 @@
 #include "LongPoint.h"
 #include "Arduino.h"
 
+
 /*------------------------------------------------------------
  
  LONGHAND DRAWING MACHINE firmware V2.2
  
- last update 08/05/2014
+ last update 20/05/2014
  by Tim Knapen
  http://www.longhand.cc/
  
@@ -34,6 +35,12 @@
 char serialBuffer[bufferLength];            // serial buffer
 int iSerialBuf = 0;							// position in the serialBuffer
 #define endline '\n'						// a command always ends with a newline '\n'
+
+// fix for mixing up of serial messages!
+#define serialDelay 200
+#define print(a) SerialUSB.print(a); delayMicroseconds(serialDelay);
+#define println(a) SerialUSB.println(a); delayMicroseconds(serialDelay);
+
 
 // BEZIER
 float bezierResolution = 10.0f;				// in how many straight lines will I approximate a bezier curve?
@@ -73,8 +80,8 @@ int rotation = 0;                           // in 90° : 1 = 90, 2 = 180, 3 = -9
 void setup(){
     while(!SerialUSB);      // wait for the serialUSB to come up
     delay(100);
-    SerialUSB.println("Longhand Drawing Machine V2.3 awaiting commands");
-	SerialUSB.println("Send me \"?\\n\" for help");
+    println("Longhand Drawing Machine V2.3 awaiting commands");
+	println("Send me \"?\\n\" for help");
    
 	//other initialization.
     state = WORKING;
@@ -123,7 +130,7 @@ void setHome(){
     set_position(0, 0, 0);
     offSet.x = 0;
     offSet.y = 0;
-    SerialUSB.println("Set new home position (x,y,z = 0,0,0 now)");
+    println("Set new home position (x,y,z = 0,0,0 now)");
 }
 
 //------------------------------------------------------------
@@ -135,12 +142,12 @@ void moveTo(long x, long y){
 void moveTo(long x, long y, long z){
     if( (x < 0 || y < 0 || z < 0  || z > 200) && !testrun){
 		// should only happen when setting the home position / doing relative moves
-		SerialUSB.print("Warning!! new target is ");
-		SerialUSB.print(x, DEC);
-		SerialUSB.print(", ");
-		SerialUSB.print(y, DEC);
-        SerialUSB.print(", ");
-        SerialUSB.println(z , DEC);
+		print("Warning!! new target is ");
+		print(x);
+		print(", ");
+		print(y);
+        print(", ");
+        println(z);
 		return;
 	}
     if( testrun ){
@@ -159,82 +166,82 @@ void moveTo(long x, long y, long z){
 //------------------------------------------------------------
 void printState(){
 	
-    SerialUSB.println();
-	SerialUSB.println(" Longhand V2.2 ");
+    println();
+	println(" Longhand V2.2 ");
     if(debug > 1){
-        SerialUSB.println(" #####################");
-        SerialUSB.println(" ### in FULL DEBUG mode ### ");
-        SerialUSB.println(" #####################");
+        println(" #####################");
+        println(" ### in FULL DEBUG mode ### ");
+        println(" #####################");
     }
-	SerialUSB.println(" -- STATE -- ");
-	SerialUSB.print(" max delay (slow): ");
-	SerialUSB.println(max_delay);
+	println(" -- STATE -- ");
+	print(" max delay (slow): ");
+	println(max_delay);
     
-	SerialUSB.print(" min delay (fast): ");
-	SerialUSB.println(min_delay);
+	print(" min delay (fast): ");
+	println(min_delay);
     
-	SerialUSB.print(" acceleration: ");
-	SerialUSB.println(acceleration);
+	print(" acceleration: ");
+	println(acceleration);
     
-	SerialUSB.print(" microSteps: ");
-	SerialUSB.println(microSteps);
+	print(" microSteps: ");
+	println(microSteps);
     
-	SerialUSB.print(" scale: ");
-	SerialUSB.println( scale );
+	print(" scale: ");
+	println( scale );
     
-	SerialUSB.print(" rotation: ");
-	SerialUSB.println( rotation );
+	print(" rotation: ");
+	println( rotation );
 	// position
-	SerialUSB.print(" Position:    ");
-	SerialUSB.print(current_pos.x);
-	SerialUSB.print(", ");
-	SerialUSB.print(current_pos.y);
-	SerialUSB.print(", ");
-	SerialUSB.println(current_pos.z);
-	SerialUSB.print(" Circle resolution (x10): ");
-	SerialUSB.println(10*circleRes);
+	print(" Position:    ");
+	print(current_pos.x);
+	print(", ");
+	print(current_pos.y);
+	print(", ");
+	println(current_pos.z);
+	print(" Circle resolution (x10): ");
+	println(10*circleRes);
 	
-	SerialUSB.print(" Bezier resolution: ");
-	SerialUSB.print( bezierResolution);
+	print(" Bezier resolution: ");
+	print( bezierResolution);
 	
 	/*
      // Just for documentation
-     SerialUSB.println("");
-     SerialUSB.println(" -- COMMANDS: --");
-     SerialUSB.println(" a command ends with a newline character ('\\n')");
+     println("");
+     println(" -- COMMANDS: --");
+     println(" a command ends with a newline character ('\\n')");
      // info
      
-     SerialUSB.println("");
-     SerialUSB.println(" - Moves");
-     SerialUSB.println(" mx,y : moveto x, y");
-     SerialUSB.println(" Mx,y,z : relative moveto x, y, z");
-     SerialUSB.println(" lx,y : lineto x, y");
-     SerialUSB.println(" ax1,y1,radius,beginAngle,angleDif : draw an arc");
-     SerialUSB.println(" bx1,y1,ax1,ay1,ax2,ay2,x2,y2 : make bezier path ");
-     SerialUSB.println(" i100 : set bezier resolution to 100. 1 = low res, 100 = high, 1000 = super high ");
-     SerialUSB.println(" ex,y,r1,r2 : Ellipse at x,y with radius r1 (width/2) and r2(height/2)");
-     SerialUSB.println(" o : Set this position as home/origin ");
-     SerialUSB.println(" h : go home ");
-     SerialUSB.println(" c : find home ");
-     SerialUSB.println(" z1 : enable the Z axis stepper ");
+     println("");
+     println(" - Moves");
+     println(" mx,y : moveto x, y");
+     println(" Mx,y,z : relative moveto x, y, z");
+     println(" lx,y : lineto x, y");
+     println(" ax1,y1,radius,beginAngle,angleDif : draw an arc");
+     println(" bx1,y1,ax1,ay1,ax2,ay2,x2,y2 : make bezier path ");
+     println(" i100 : set bezier resolution to 100. 1 = low res, 100 = high, 1000 = super high ");
+     println(" ex,y,r1,r2 : Ellipse at x,y with radius r1 (width/2) and r2(height/2)");
+     println(" o : Set this position as home/origin ");
+     println(" h : go home ");
+     println(" c : find home ");
+     println(" z1 : enable the Z axis stepper ");
      
      
-     SerialUSB.println("");
-     SerialUSB.println(" - Settings");
-     SerialUSB.println(" d1 : set debug to 1 (level 1)");
-     SerialUSB.println(" t1 : set testrun to 1 (the machine will not move the steppers");
-     SerialUSB.println(" r10 : set circle resolution to 10degrees / part");
-     SerialUSB.println(" x50 : set scale to 50%");
-     SerialUSB.println(" v2 : rotation = 2*90°");
-     SerialUSB.println(" s1000,2000,5 : set speeds :min delay = 1000, max delay = 2000, acceleration = 5");
+     println("");
+     println(" - Settings");
+     println(" d1 : set debug to 1 (level 1)");
+     println(" t1 : set testrun to 1 (the machine will not move the steppers");
+     println(" r10 : set circle resolution to 10degrees / part");
+     println(" x50 : set scale to 50%");
+     println(" v2 : rotation = 2*90°");
+     println(" s1000,2000,5 : set speeds :min delay = 1000, max delay = 2000, acceleration = 5");
      
-     SerialUSB.println("");
-     SerialUSB.println(" - Read Write Files");
-     SerialUSB.println(" f : print the list of  .lhd files on the SD card");
-     SerialUSB.println(" kFilename.lhd : delete Filename.lhd from the SD card");
-     SerialUSB.println(" pFilename.lhd : start drawing from the file myfile.lhd on the SD card");
-     SerialUSB.println(" wFilename.lhd : start writing from serial to Filename.lhd on SD, \\r (car. return) to end writing");
-     SerialUSB.println("");
+     println("");
+     println(" - Read Write Files");
+     println(" f : print the list of  .lhd files on the SD card");
+     println(" kFilename.lhd : delete Filename.lhd from the SD card");
+     println(" pFilename.lhd : start drawing from the file myfile.lhd on the SD card");
+     println(" wFilename.lhd : start writing from serial to Filename.lhd on SD, \\r (car. return) to end writing");
+     println("");
      
      */
 }
@@ -242,14 +249,10 @@ void printState(){
 //------------------------------------------------------------
 void printPos(long x, long y, long z){
 	// print my current position to the serial port
-	SerialUSB.print("_p");
-	SerialUSB.print(x);
-	SerialUSB.print(" ");
-	SerialUSB.print(y);
-	SerialUSB.print(" ");
-	SerialUSB.println(z);
-	delayMicroseconds(5);
-    if(testrun){
-        delay(1); // trying the to squash the mangled feedback bug
-    }
+	print("_p");
+	print(x);
+	print(" ");
+	print(y);
+	print(" ");
+	println(z);
 }

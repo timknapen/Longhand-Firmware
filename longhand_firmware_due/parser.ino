@@ -44,9 +44,9 @@ float lVals[MAX_PARSE_VALUES];	// long values
 //------------------------------------------------------------
 void parseMessage(char* input, int length){
     if(length  < 1){ // BAD MESSAGE!
-        SerialUSB.print("BAD message: too short '");
-        SerialUSB.print(input);
-        SerialUSB.println("'");
+        print("BAD message: too short '");
+        print(input);
+        println("'");
         return;
     }
     int value = 0; // calculate number following the command
@@ -105,13 +105,13 @@ void parseMessage(char* input, int length){
             debug = value;
             switch(debug){
                 case 0:
-                    SerialUSB.println("Debug is OFF");
+                    println("Debug is OFF");
                     break;
                 case 1:
-                    SerialUSB.println("Debug is ON");
+                    println("Debug is ON");
                     break;
                 case 2:
-                    SerialUSB.println("Debug is ON HIGH ALERT");
+                    println("Debug is ON HIGH ALERT");
                     break;
             }
             break;
@@ -121,8 +121,8 @@ void parseMessage(char* input, int length){
             bezierResolution = value;
             if(bezierResolution == 0.0f) bezierResolution = 1.0f;
             if(debug){
-                SerialUSB.print("Bezier Resolution: ");
-                SerialUSB.println((int)bezierResolution);
+                print("Bezier Resolution: ");
+                println((int)bezierResolution);
             }
             break;
             
@@ -131,8 +131,8 @@ void parseMessage(char* input, int length){
             circleRes = value;
             if(circleRes < 0.1) circleRes = 1;
             if(debug){
-                SerialUSB.print("Circle resolution (x10)= ");
-                SerialUSB.println(10*circleRes);
+                print("Circle resolution (x10)= ");
+                println(10*circleRes);
             }
             break;
             
@@ -146,10 +146,10 @@ void parseMessage(char* input, int length){
             testrun = value;
             if(debug){
                 if(testrun){
-                    SerialUSB.println("Machine is in preview mode");
+                    println("Machine is in preview mode");
                 }
                 else{
-                    SerialUSB.println("Machine is in active mode");
+                    println("Machine is in active mode");
                 }
             }
             break;
@@ -157,33 +157,33 @@ void parseMessage(char* input, int length){
         case 'u':
         case 'U':
             setMicroSteps(value);
-            SerialUSB.print("Microsteps set to 1/");
-            SerialUSB.println(value);
+            print("Microsteps set to 1/");
+            println(value);
             break;
             
         case 'x':
         case 'X':	// set scale
             scale = value;
-            SerialUSB.print("Scale is ");
-            SerialUSB.println(scale);
+            print("Scale is ");
+            println(scale);
             break;
             
         case 'v':
         case 'V':	// set rotation
             rotation = value;
-            SerialUSB.print("Rotation is ");
+            print("Rotation is ");
             switch (rotation) {
                 case 0:
-                    SerialUSB.println("Up");
+                    println("Up");
                     break;
                 case 1:
-                    SerialUSB.println("Right");
+                    println("Right");
                     break;
                 case 2:
-                    SerialUSB.println("Down");
+                    println("Down");
                     break;
                 case 3:
-                    SerialUSB.println("Left");
+                    println("Left");
                     break;
                 default:
                     break;
@@ -234,7 +234,7 @@ void parseMessage(char* input, int length){
             printState();
             break;
         default:	// bad command
-            SerialUSB.println("? bad command");
+            println("? bad command");
             break;
     }
     
@@ -292,12 +292,12 @@ void parseDelays(char * mssg, int length){
     max_delay = lVals[1];		// the slowest speed possible.
     acceleration = lVals[2];	// gets added each step to the delay to calculate the acceleration speed
     if(debug){
-        SerialUSB.print("min delay: ");
-        SerialUSB.println(min_delay);
-        SerialUSB.print("max_delay: ");
-        SerialUSB.println(max_delay);
-        SerialUSB.print("acceleration: ");
-        SerialUSB.println(acceleration);
+        print("min delay: ");
+        println(min_delay);
+        print("max_delay: ");
+        println(max_delay);
+        print("acceleration: ");
+        println(acceleration);
     }
 }
 
