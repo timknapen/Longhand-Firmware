@@ -10,7 +10,7 @@
  
  LONGHAND DRAWING MACHINE firmware
  
- last update 24/10/2014
+ last update 25/10/2014
  by Tim Knapen
  http://www.longhand.cc/
  
@@ -206,11 +206,14 @@ void printState() {
 	print(current_pos.y);
 	print(", ");
 	println(current_pos.z);
-	print(" Circle resolution (x10): ");
-	println(10 * circleRes);
 	
-	print(" Bezier resolution: ");
-	print( bezierResolution);
+	/*
+	 print(" Circle resolution (x10): ");
+	 println(10 * circleRes);
+	 
+	 print(" Bezier resolution: ");
+	 print( bezierResolution);
+	 */
 	
 	/*
      // Just for documentation
@@ -264,3 +267,4 @@ void printPos(long x, long y, long z) {
 	print(" ");
 	println(z);
 }
+
