@@ -8,9 +8,9 @@
 
 /*------------------------------------------------------------
  
- LONGHAND DRAWING MACHINE firmware V2.2
+ LONGHAND DRAWING MACHINE firmware
  
- last update 20/05/2014
+ last update 24/10/2014
  by Tim Knapen
  http://www.longhand.cc/
  
@@ -22,8 +22,12 @@
  Compiled and tested with
  - Arduino 1.5.2
  - Arduino 1.5.6-r2
+ - Arduino 1.5.6-r2 serialUSBPatched
+ updated CDC.cpp and USBCore.cpp see: http://forum.arduino.cc/index.php/topic,140543.0.html
  
  ------------------------------------------------------------*/
+
+#define VERSION "V2.4"
 
 // This is meant for Arduino DUE!
 #ifndef _VARIANT_ARDUINO_DUE_X_
@@ -53,14 +57,14 @@ int state = WORKING;
 
 // DEBUG
 int debug = 0;                              // set the debug level
-bool testrun = true;						// to check if I'm doing a testrun
+bool bPreview = true;						// to check if I'm doing a preview, not actually drawing.
 
 // SPEEDS
 int current_delay = 1000;					// in microsecs
-int min_delay = 1000;						// the fastest speed possible
-int max_delay = 3000;						// the slowest speed possible.
-int acceleration = 10;						// gets added each step to the delay to calculate the acceleration speed
-int microSteps = 8;							// the type of microsteps we are taking, default is 1/8th step
+int min_delay =		1000;					// the fastest speed possible
+int max_delay =		3000;					// the slowest speed possible.
+int acceleration =	10;						// gets added each step to the delay to calculate the acceleration speed
+int microSteps =	8;						// the type of microsteps we are taking, default is 1/8th step
 
 // DISTANCE (keep track of how long a print will take)
 unsigned long travelDistance = 0L;
@@ -77,22 +81,24 @@ int scale = 1;                              // scale factor
 int rotation = 0;                           // in 90° : 1 = 90, 2 = 180, 3 = -90
 
 //------------------------------------------------------------
-void setup(){
-    while(!SerialUSB);      // wait for the serialUSB to come up
-    delay(100);
-    println("Longhand Drawing Machine V2.3 awaiting commands");
+void setup() {
+	while (!SerialUSB);     // wait for the serialUSB to come up
+	delay(100);
+	print("Longhand Drawing Machine ");
+	print(VERSION);
+	println(" awaiting commands");
 	println("Send me \"?\\n\" for help");
-   
+	
 	//other initialization.
-    state = WORKING;
-    init_steppers();
+	state = WORKING;
+	init_steppers();
 	disable_steppers();
 	
 }
 
 //------------------------------------------------------------
-void loop(){
-    
+void loop() {
+	
 	stateMachine();
 	
 	// while doing nothing make the delay go to max (slowest speed)
@@ -104,8 +110,8 @@ void loop(){
 
 
 //------------------------------------------------------------
-void stateMachine(){
-	switch(state){
+void stateMachine() {
+	switch (state) {
 		case WORKING:
 			checkSerial();
 			break;
@@ -117,7 +123,7 @@ void stateMachine(){
 
 
 //------------------------------------------------------------
-void goHome(){
+void goHome() {
 	moveTo(current_pos.x, current_pos.y, 100); // lift brush on current position
 	moveTo(0, 0, 100);
 	disable_steppers();
@@ -125,36 +131,36 @@ void goHome(){
 
 
 //------------------------------------------------------------
-void setHome(){
-    // set the current position as 0,0,0
-    set_position(0, 0, 0);
-    offSet.x = 0;
-    offSet.y = 0;
-    println("Set new home position (x,y,z = 0,0,0 now)");
+void setHome() {
+	// set the current position as 0,0,0
+	set_position(0, 0, 0);
+	offSet.x = 0;
+	offSet.y = 0;
+	println("Set new home position (x,y,z = 0,0,0 now)");
 }
 
 //------------------------------------------------------------
-void moveTo(long x, long y){
-    moveTo(x, y, current_pos.z);
+void moveTo(long x, long y) {
+	moveTo(x, y, current_pos.z);
 }
 
 //------------------------------------------------------------
-void moveTo(long x, long y, long z){
-    if( (x < 0 || y < 0 || z < 0  || z > 200) && !testrun){
+void moveTo(long x, long y, long z) {
+	if ( (x < 0 || y < 0 || z < 0  || z > 200) && !bPreview) {
 		// should only happen when setting the home position / doing relative moves
 		print("Warning!! new target is ");
 		print(x);
 		print(", ");
 		print(y);
-        print(", ");
-        println(z);
+		print(", ");
+		println(z);
 		return;
 	}
-    if( testrun ){
-        // calculate the distance
-        travelDistance += (unsigned long) sqrt( (x - current_pos.x) * (x - current_pos.x) +
-                                                (y - current_pos.y) * (y - current_pos.y));
-    }
+	if ( bPreview ) {
+		// calculate the distance
+		travelDistance += (unsigned long) sqrt( (x - current_pos.x) * (x - current_pos.x) +
+											   (y - current_pos.y) * (y - current_pos.y));
+	}
 	set_target(x, y, z);
 	dda_move(max_delay);
 }
@@ -164,31 +170,33 @@ void moveTo(long x, long y, long z){
 // HELPERS
 //------------------------------------------------------------
 //------------------------------------------------------------
-void printState(){
+void printState() {
+	printPos(current_pos.x, current_pos.y, current_pos.z);
 	
-    println();
-	println(" Longhand V2.2 ");
-    if(debug > 1){
-        println(" #####################");
-        println(" ### in FULL DEBUG mode ### ");
-        println(" #####################");
-    }
+	println();
+	print(" Longhand ");
+	println(VERSION);
+	if (debug > 1) {
+		println(" #####################");
+		println(" ### in FULL DEBUG mode ### ");
+		println(" #####################");
+	}
 	println(" -- STATE -- ");
 	print(" max delay (slow): ");
 	println(max_delay);
-    
+	
 	print(" min delay (fast): ");
 	println(min_delay);
-    
+	
 	print(" acceleration: ");
 	println(acceleration);
-    
+	
 	print(" microSteps: ");
 	println(microSteps);
-    
+	
 	print(" scale: ");
 	println( scale );
-    
+	
 	print(" rotation: ");
 	println( rotation );
 	// position
@@ -199,7 +207,7 @@ void printState(){
 	print(", ");
 	println(current_pos.z);
 	print(" Circle resolution (x10): ");
-	println(10*circleRes);
+	println(10 * circleRes);
 	
 	print(" Bezier resolution: ");
 	print( bezierResolution);
@@ -210,7 +218,7 @@ void printState(){
      println(" -- COMMANDS: --");
      println(" a command ends with a newline character ('\\n')");
      // info
-     
+	 
      println("");
      println(" - Moves");
      println(" mx,y : moveto x, y");
@@ -224,17 +232,17 @@ void printState(){
      println(" h : go home ");
      println(" c : find home ");
      println(" z1 : enable the Z axis stepper ");
-     
-     
+	 
+	 
      println("");
      println(" - Settings");
      println(" d1 : set debug to 1 (level 1)");
-     println(" t1 : set testrun to 1 (the machine will not move the steppers");
+     println(" t1 : set bPreview to 1 (the machine will not move the steppers");
      println(" r10 : set circle resolution to 10degrees / part");
      println(" x50 : set scale to 50%");
      println(" v2 : rotation = 2*90°");
      println(" s1000,2000,5 : set speeds :min delay = 1000, max delay = 2000, acceleration = 5");
-     
+	 
      println("");
      println(" - Read Write Files");
      println(" f : print the list of  .lhd files on the SD card");
@@ -242,12 +250,12 @@ void printState(){
      println(" pFilename.lhd : start drawing from the file myfile.lhd on the SD card");
      println(" wFilename.lhd : start writing from serial to Filename.lhd on SD, \\r (car. return) to end writing");
      println("");
-     
+	 
      */
 }
 
 //------------------------------------------------------------
-void printPos(long x, long y, long z){
+void printPos(long x, long y, long z) {
 	// print my current position to the serial port
 	print("_p");
 	print(x);

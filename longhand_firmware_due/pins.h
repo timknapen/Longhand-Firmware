@@ -3,7 +3,7 @@
 
 /****************************************************************************************
  * Arduino DUE pin assignment
- * 
+ *
  * These are the pins for Longhand Controller PCB V1
  * They also work with the Arduino WiFiShield, when testing SD reads etc.
  *
@@ -20,14 +20,14 @@
 
 // Y STEPPER
 #define Y_ENABLE_PIN	(byte)22
-#define Y_STEP_PIN	(byte)30
-#define Y_DIR_PIN	(byte)34
+#define Y_STEP_PIN		(byte)30
+#define Y_DIR_PIN		(byte)34
 
 
 // Z STEPPER
 #define Z_ENABLE_PIN	(byte)44
 #define Z_STEP_PIN      (byte)50
-#define Z_DIR_PIN	(byte)52
+#define Z_DIR_PIN		(byte)52
 
 
 // MICRO STEPPING
@@ -39,7 +39,7 @@
 
 
 // END STOPS
-#define X_MIN_PIN		(byte)9	       
+#define X_MIN_PIN		(byte)9
 #define Y_MIN_PIN		(byte)2
 #define Z_MIN_PIN		(byte)3
 

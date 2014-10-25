@@ -141,11 +141,11 @@ void parseMessage(char* input, int length){
             parseDelays(&input[1], length-1);
             break;
             
-        case 't':	// switch testrun on / off
+        case 't':	// switch bPreview on / off
         case 'T':
-            testrun = value;
+            bPreview = value;
             if(debug){
-                if(testrun){
+                if(bPreview){
                     println("Machine is in preview mode");
                 }
                 else{
@@ -336,9 +336,9 @@ void parseMoveTo(char* mssg, int length){
     if(valnum < 2) return;
     long x = lVals[0];
     long y = lVals[1];
-   
+    
     if(isDrawingFromFile){ // only scale and rotate when drawing from file
-       
+        
         switch (rotation) {
             case 1: // 90
                 x = - lVals[1];
@@ -358,7 +358,7 @@ void parseMoveTo(char* mssg, int length){
         y *= scale;
         
     }
-
+    
     if( current_pos.x == x && current_pos.y == y){
         // it's a useless move to!
         return;
@@ -375,8 +375,8 @@ void parseRelativeMoveTo(char* mssg, int length){
     long x = lVals[0];
     long y = lVals[1];
     long z = 0;
-    if(valnum < 3){ // z was not set, so use 0
-        lVals[2] = 0;
+    if(valnum >= 3){ // z was not set, so use 0
+        z = lVals[2];
     }
     
     if(isDrawingFromFile){ // only scale and rotate when drawing from file

@@ -61,17 +61,17 @@ void bezier(long x0, long y0, long x1, long y1, long x2, long y2, long x3, long 
 //--------------------------------------------------------------
 void ellipse(long cx, long cy, long rx, long ry){
 	set_target( cx + rx*cos(PI),
-				cy + ry*sin(PI),
-				0); // pen down!
+			   cy + ry*sin(PI),
+			   0); // pen down!
 	dda_move(min_delay);
 	
 	for(float i = 0; i <= 360.0f; i +=circleRes){
 		set_target(	cx + rx*cos(PI + PI*(float)i/180.0),
-					cy + ry*sin(PI + PI*(float)i/180.0));
+				   cy + ry*sin(PI + PI*(float)i/180.0));
 		dda_move(min_delay);
 	}
 	set_target( cx + rx*cos(PI + PI*360.0f/180.0),
-				cy + ry*sin(PI + PI*360.0f/180.0));
+			   cy + ry*sin(PI + PI*360.0f/180.0));
 	dda_move(max_delay);//slow down for the last part
 	
 }
@@ -99,7 +99,7 @@ void arc(float xc, float yc, float r, float beginAngle, float endAngle){
 	// [ c d ]
 	// r_T = [ cos(phi) -sin(phi) ]
 	//       [ sin(phi)  cos(phi) ] * r
-	// applying rotation:
+	// Applying rotation:
 	//  x = x1 * Math.Cos(angleStep) - y1 * Math.Sin(angleStep);
 	//  y = y1 * Math.Cos(angleStep) + x1 * Math.Sin(angleStep);
 	float sinAngle, cosAngle;
