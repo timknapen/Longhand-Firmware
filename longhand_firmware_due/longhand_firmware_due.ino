@@ -207,6 +207,9 @@ void printState() {
 	print(", ");
 	println(current_pos.z);
 	
+	print (" free ram: ");
+	println ( freeRam());
+	
 	/*
 	 print(" Circle resolution (x10): ");
 	 println(10 * circleRes);
@@ -267,4 +270,24 @@ void printPos(long x, long y, long z) {
 	print(" ");
 	println(z);
 }
+
+#ifdef __arm__
+// should use uinstd.h to define sbrk but Due causes a conflict
+extern "C" char* sbrk(int incr);
+#else  // __ARM__
+extern char *__brkval;
+extern char __bss_end;
+#endif  // __arm__
+
+//------------------------------------------------------------------------------
+int freeRam() {
+	// from https://github.com/greiman/SdFat
+	char top;
+#ifdef __arm__
+	return &top - reinterpret_cast<char*>(sbrk(0));
+#else  // __arm__
+	return __brkval ? &top - __brkval : &top - &__bss_end;
+#endif  // __arm__
+}
+
 

@@ -30,7 +30,8 @@ void startWritingToFile( char * filename, int length) {
 			filename[i] = '_';
 		}
 	}
-	print(" Writing to ");
+	println(" - - - - - ");
+	print(" Starting to write to file ");
 	println(filename);
 	
 	// close the write file if it's still open ( shouldn't happen )
@@ -66,7 +67,7 @@ void stopWriting() {
 	if (root) {
 		root.close();
 	}
-	
+	println(" - - - - - ");
 	print("Done writing ");
 	print(numbyteswritten);
 	println(" bytes to file");
