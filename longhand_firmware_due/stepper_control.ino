@@ -213,8 +213,8 @@ void dda_move(long micro_delay)
   		// turn on steppers to start moving
   		enable_steppers();
   	}
-  	if(!bPreview && current_pos.z == 0 && target_pos.z == 0){
-		// let Z fall down if it is at 0
+  	if(!bPreview && current_pos.z == 0 && target_pos.z == 0 && tool == TOOL_PEN){
+		// let Z fall down if it is at 0 - only in PEN mode!
 		disable_z();
 	}
   	// figure out our deltas

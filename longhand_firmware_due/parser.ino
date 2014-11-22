@@ -24,7 +24,7 @@ float lVals[MAX_PARSE_VALUES];	// long values
  * k    Kill        : delete a file
  * l	Lineto      : put the pen down and go to position (x,y)
  * m	Moveto      : move the pen to position (x,y,z)
- * n
+ * n	tool selection: 1 = Pen, 2 = Brush
  * o	Origin      : set as origin
  * p	Print       : draw a file
  * q
@@ -115,7 +115,21 @@ void parseMessage(char* input, int length){
                     break;
             }
             break;
-            
+		case 'n':
+		case 'N':
+			tool = value;
+			switch (tool) {
+				default:
+					println("tool set to UNKNOWN");
+					break;
+				case 1:
+					println("tool set to PEN");
+					break;
+				case 2:
+					println("tool set to BRUSH");
+					break;
+			}
+			break;
         case 'i':
         case 'I':	// set bezier resolution
             bezierResolution = value;

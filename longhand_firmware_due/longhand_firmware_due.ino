@@ -10,7 +10,7 @@
  
  LONGHAND DRAWING MACHINE firmware
  
- last update 25/10/2014
+ last update 22/11/2014
  by Tim Knapen
  http://www.longhand.cc/
  
@@ -23,11 +23,12 @@
  - Arduino 1.5.2
  - Arduino 1.5.6-r2
  - Arduino 1.5.6-r2 serialUSBPatched
- updated CDC.cpp and USBCore.cpp see: http://forum.arduino.cc/index.php/topic,140543.0.html
+  updated CDC.cpp and USBCore.cpp see: http://forum.arduino.cc/index.php/topic,140543.0.html
+ - Arduino 1.5.8 ? (has both files already patched!)
  
  ------------------------------------------------------------*/
 
-#define VERSION "V2.4"
+#define VERSION "V2.5"
 
 // This is meant for Arduino DUE!
 #ifndef _VARIANT_ARDUINO_DUE_X_
@@ -79,6 +80,13 @@ LongPoint offSet;
 bool isDrawingFromFile = false;             // are we drawing from a file?
 int scale = 1;                              // scale factor
 int rotation = 0;                           // in 90° : 1 = 90, 2 = 180, 3 = -90
+
+// tool selection
+#define TOOL_PEN 1
+#define TOOL_BRUSH 2
+
+int tool = TOOL_PEN;
+
 
 //------------------------------------------------------------
 void setup() {
@@ -209,14 +217,6 @@ void printState() {
 	
 	print (" free ram: ");
 	println ( freeRam());
-	
-	/*
-	 print(" Circle resolution (x10): ");
-	 println(10 * circleRes);
-	 
-	 print(" Bezier resolution: ");
-	 print( bezierResolution);
-	 */
 	
 	/*
      // Just for documentation
