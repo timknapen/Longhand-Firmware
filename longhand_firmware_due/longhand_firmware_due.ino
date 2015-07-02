@@ -10,7 +10,7 @@
  
  LONGHAND DRAWING MACHINE firmware
  
- last update 22/11/2014
+ last update 02/07/2015
  by Tim Knapen
  http://www.longhand.cc/
  
@@ -28,7 +28,7 @@
  
  ------------------------------------------------------------*/
 
-#define VERSION "V2.5"
+#define VERSION "V2.6"
 
 // This is meant for Arduino DUE!
 #ifndef _VARIANT_ARDUINO_DUE_X_
@@ -64,17 +64,20 @@ bool bPreview = true;						// to check if I'm doing a preview, not actually draw
 int current_delay = 1000;					// in microsecs
 int min_delay =		1000;					// the fastest speed possible
 int max_delay =		3000;					// the slowest speed possible.
-int acceleration =	10;						// gets added each step to the delay to calculate the acceleration speed
-int microSteps =	8;						// the type of microsteps we are taking, default is 1/8th step
+int acceleration =	10;					// gets added each step to the delay to calculate the acceleration speed
+int microSteps =	8;					// the type of microsteps we are taking, default is 1/8th step
+
 
 // DISTANCE (keep track of how long a print will take)
 unsigned long travelDistance = 0L;
 
 // POSITIONS (for steppers)
 LongPoint current_pos;						// current position in steps
-LongPoint target_pos;						// targent position in steps
+LongPoint target_pos;						// target position in steps
 LongPoint delta_steps;						// the distances on each axis
 LongPoint offSet;
+
+float mmToStep = 42.735;					// convert mm commands to steps!
 
 // scale existing drawings, but only when drawing from file!
 bool isDrawingFromFile = false;             // are we drawing from a file?
@@ -219,45 +222,45 @@ void printState() {
 	println ( freeRam());
 	
 	/*
-     // Just for documentation
-     println("");
-     println(" -- COMMANDS: --");
-     println(" a command ends with a newline character ('\\n')");
-     // info
+	 // Just for documentation
+	 println("");
+	 println(" -- COMMANDS: --");
+	 println(" a command ends with a newline character ('\\n')");
+	 // info
 	 
-     println("");
-     println(" - Moves");
-     println(" mx,y : moveto x, y");
-     println(" Mx,y,z : relative moveto x, y, z");
-     println(" lx,y : lineto x, y");
-     println(" ax1,y1,radius,beginAngle,angleDif : draw an arc");
-     println(" bx1,y1,ax1,ay1,ax2,ay2,x2,y2 : make bezier path ");
-     println(" i100 : set bezier resolution to 100. 1 = low res, 100 = high, 1000 = super high ");
-     println(" ex,y,r1,r2 : Ellipse at x,y with radius r1 (width/2) and r2(height/2)");
-     println(" o : Set this position as home/origin ");
-     println(" h : go home ");
-     println(" c : find home ");
-     println(" z1 : enable the Z axis stepper ");
+	 println("");
+	 println(" - Moves");
+	 println(" mx,y : moveto x, y");
+	 println(" Mx,y,z : relative moveto x, y, z");
+	 println(" lx,y : lineto x, y");
+	 println(" ax1,y1,radius,beginAngle,angleDif : draw an arc");
+	 println(" bx1,y1,ax1,ay1,ax2,ay2,x2,y2 : make bezier path ");
+	 println(" i100 : set bezier resolution to 100. 1 = low res, 100 = high, 1000 = super high ");
+	 println(" ex,y,r1,r2 : Ellipse at x,y with radius r1 (width/2) and r2(height/2)");
+	 println(" o : Set this position as home/origin ");
+	 println(" h : go home ");
+	 println(" c : find home ");
+	 println(" z1 : enable the Z axis stepper ");
 	 
 	 
-     println("");
-     println(" - Settings");
-     println(" d1 : set debug to 1 (level 1)");
-     println(" t1 : set bPreview to 1 (the machine will not move the steppers");
-     println(" r10 : set circle resolution to 10degrees / part");
-     println(" x50 : set scale to 50%");
-     println(" v2 : rotation = 2*90°");
-     println(" s1000,2000,5 : set speeds :min delay = 1000, max delay = 2000, acceleration = 5");
+	 println("");
+	 println(" - Settings");
+	 println(" d1 : set debug to 1 (level 1)");
+	 println(" t1 : set bPreview to 1 (the machine will not move the steppers");
+	 println(" r10 : set circle resolution to 10degrees / part");
+	 println(" x50 : set scale to 50%");
+	 println(" v2 : rotation = 2*90°");
+	 println(" s1000,2000,5 : set speeds :min delay = 1000, max delay = 2000, acceleration = 5");
 	 
-     println("");
-     println(" - Read Write Files");
-     println(" f : print the list of  .lhd files on the SD card");
-     println(" kFilename.lhd : delete Filename.lhd from the SD card");
-     println(" pFilename.lhd : start drawing from the file myfile.lhd on the SD card");
-     println(" wFilename.lhd : start writing from serial to Filename.lhd on SD, \\r (car. return) to end writing");
-     println("");
+	 println("");
+	 println(" - Read Write Files");
+	 println(" f : print the list of  .lhd files on the SD card");
+	 println(" kFilename.lhd : delete Filename.lhd from the SD card");
+	 println(" pFilename.lhd : start drawing from the file myfile.lhd on the SD card");
+	 println(" wFilename.lhd : start writing from serial to Filename.lhd on SD, \\r (car. return) to end writing");
+	 println("");
 	 
-     */
+	 */
 }
 
 //------------------------------------------------------------
