@@ -268,7 +268,7 @@ int parseLongs(char * input, int length) {
 	for ( int i = 0; i < length - 1; i++) { // length-1 because we always parse from the position after the comma: atof(input[i+1])
 		c = input[i];
 		if ( c == ',' && v < MAX_PARSE_VALUES) {
-			lVals[v] = mmToStep * atof(&input[i + 1]);
+			lVals[v] = atof(&input[i + 1]);
 			v ++;
 		}
 	}
@@ -371,11 +371,13 @@ void parseMoveTo(char* mssg, int length) {
 				break;
 		}
 		
-		x *= mmToStep * scale;
-		y *= mmToStep * scale;
+		x *= scale;
+		y *= scale;
 		
 	}
 	
+	x *= mmToStep;
+	y *= mmToStep;
 	if ( current_pos.x == x && current_pos.y == y) {
 		// it's a useless move to!
 		return;
@@ -412,10 +414,14 @@ void parseRelativeMoveTo(char* mssg, int length) {
 				break;
 		}
 		
-		x *= mmToStep * scale;
-		y *= mmToStep * scale;
+		x *= scale;
+		y *= scale;
 		
 	}
+	
+	x *= mmToStep;
+	y *= mmToStep;
+	
 	moveTo(current_pos.x + x, current_pos.y + y, current_pos.z + z);
 }
 
@@ -447,10 +453,13 @@ void parseLineTo(char* mssg, int length) {
 				break;
 		}
 		
-		x *= mmToStep * scale;
-		y *= mmToStep * scale;
+		x *= scale;
+		y *= scale;
 		
 	}
+	
+	x *= mmToStep;
+	y *= mmToStep;
 	
 	if (current_pos.z != z) {
 		moveTo(current_pos.x, current_pos.y, z);
