@@ -211,12 +211,23 @@ void printState() {
 	print(" rotation: ");
 	println( rotation );
 	// position
-	print(" Position:    ");
+	print(" Position:\n \t");
 	print(current_pos.x);
 	print(", ");
 	print(current_pos.y);
 	print(", ");
-	println(current_pos.z);
+	print(current_pos.z);
+	println(" steps");
+	
+	print(" \t");
+	print((float)current_pos.x/mmToStep);
+	print(", ");
+	print((float)current_pos.y/mmToStep);
+	print(", ");
+	print((float)current_pos.z/mmToStep);
+	print(" mm  (1mm = ");
+	print(mmToStep);
+	println(" steps)");
 	
 	print (" free ram: ");
 	println ( freeRam());
@@ -267,11 +278,11 @@ void printState() {
 void printPos(long x, long y, long z) {
 	// print my current position to the serial port
 	print("_p");
-	print(x);
+	print((float)x/mmToStep);
 	print(" ");
-	print(y);
+	print((float)y/mmToStep);
 	print(" ");
-	println(z);
+	println((float)z/mmToStep);
 }
 
 #ifdef __arm__
