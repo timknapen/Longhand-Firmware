@@ -320,10 +320,14 @@ void parseDelays(char * mssg, int length) {
 void parseBezier( char * mssg, int length) {
 	int valnum =  parseFloats(mssg, length);
 	if ( valnum < 8) return;
-	bezier( mmToStep * scale * fVals[0], mmToStep * scale * fVals[1],
-		   mmToStep * scale * fVals[2], mmToStep * scale * fVals[3],
-		   mmToStep * scale * fVals[4], mmToStep * scale * fVals[5],
-		   mmToStep * scale * fVals[6], mmToStep * scale * fVals[7] );
+	bezier((long)(mmToStep * scale * fVals[0]),
+		   (long)(mmToStep * scale * fVals[1]),
+		   (long)(mmToStep * scale * fVals[2]),
+		   (long)(mmToStep * scale * fVals[3]),
+		   (long)( mmToStep * scale * fVals[4]),
+		   (long)(mmToStep * scale * fVals[5]),
+		   (long)( mmToStep * scale * fVals[6]),
+		   (long)(mmToStep * scale * fVals[7]));
 }
 
 
@@ -332,9 +336,11 @@ void parseArc(char* mssg, int length) {
 	int valnum =  parseFloats(mssg, length);
 	if (valnum < 5) return;
 	// arc(x,y, radius, beginAngle, endAngle )
-	arc(  mmToStep * scale * fVals[0],
-		mmToStep * scale * fVals[1],
-		mmToStep * scale * fVals[2], fVals[3], fVals[4] );
+	arc((long)(mmToStep * scale * fVals[0]),
+		  (long)(mmToStep * scale * fVals[1]),
+		  (long)(mmToStep * scale * fVals[2]),
+		(long)fVals[3],
+		(long)fVals[4] );
 }
 
 
@@ -342,8 +348,10 @@ void parseArc(char* mssg, int length) {
 void parseEllipse(char* mssg, int length) {
 	int valnum =  parseFloats(mssg, length);
 	if (valnum < 4) return;
-	ellipse( mmToStep * scale * fVals[0], mmToStep * scale * fVals[1],
-			mmToStep * scale * fVals[2], mmToStep * scale * fVals[3]);
+	ellipse((long)(mmToStep * scale * fVals[0]),
+			(long)(mmToStep * scale * fVals[1]),
+			(long)(mmToStep * scale * fVals[2]),
+			(long)(mmToStep * scale * fVals[3]));
 }
 
 
@@ -351,8 +359,8 @@ void parseEllipse(char* mssg, int length) {
 void parseMoveTo(char* mssg, int length) {
 	int valnum =  parseFloats(mssg, length);
 	if (valnum < 2) return;
-	long x = fVals[0];
-	long y = fVals[1];
+	float x = fVals[0];
+	float y = fVals[1];
 	
 	if (isDrawingFromFile) { // only scale and rotate when drawing from file
 		
@@ -378,12 +386,13 @@ void parseMoveTo(char* mssg, int length) {
 	
 	x *= mmToStep;
 	y *= mmToStep;
-	if ( current_pos.x == x && current_pos.y == y) {
+	
+	if ( current_pos.x == (long)x && current_pos.y == (long)y) {
 		// it's a useless move to!
 		return;
 	}
-	moveTo(current_pos.x, current_pos.y, 100); // brush up at current position
-	moveTo(offSet.x + x, offSet.y + y, 100);
+	moveTo((long)(current_pos.x), (long)(current_pos.y), 100); // brush up at current position
+	moveTo(offSet.x + (long)x, offSet.y + (long)y, 100);
 }
 
 
@@ -391,9 +400,9 @@ void parseMoveTo(char* mssg, int length) {
 void parseRelativeMoveTo(char* mssg, int length) {
 	int valnum =  parseFloats(mssg, length);
 	if (valnum < 2) return;
-	long x = fVals[0];
-	long y = fVals[1];
-	long z = 0;
+	float x = fVals[0];
+	float y = fVals[1];
+	float z = 0;
 	if (valnum >= 3) { // z was not set, so use 0
 		z = fVals[2];
 	}
@@ -422,16 +431,16 @@ void parseRelativeMoveTo(char* mssg, int length) {
 	x *= mmToStep;
 	y *= mmToStep;
 	
-	moveTo(current_pos.x + x, current_pos.y + y, current_pos.z + z);
+	moveTo(current_pos.x + (long)x, current_pos.y + (long)y, current_pos.z + (long)z);
 }
 
 //------------------------------------------------------------
 void parseLineTo(char* mssg, int length) {
 	int valnum =  parseFloats(mssg, length);
 	if (valnum < 2) return;
-	long x = fVals[0];
-	long y = fVals[1];
-	long z = 0;
+	float x = fVals[0];
+	float y = fVals[1];
+	float z = 0;
 	if (valnum < 3) { // z was not set, so use 0
 		fVals[2] = 0;
 	}
@@ -461,11 +470,11 @@ void parseLineTo(char* mssg, int length) {
 	x *= mmToStep;
 	y *= mmToStep;
 	
-	if (current_pos.z != z) {
-		moveTo(current_pos.x, current_pos.y, z);
+	if (current_pos.z != (long)z) {
+		moveTo(current_pos.x, current_pos.y, (long)z);
 	}
 	
-	moveTo(offSet.x + x, offSet.y + y, z);
+	moveTo(offSet.x + (long)x, offSet.y + (long)y, (long)z);
 }
 
 

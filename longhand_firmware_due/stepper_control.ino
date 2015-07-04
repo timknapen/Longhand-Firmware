@@ -342,6 +342,8 @@ void dda_move(long micro_delay)
   		x_can_step = (current_pos.x != target_pos.x) && checkEndstop( X_MIN_PIN, x_direction ); // added endstop check
 		y_can_step = (current_pos.y != target_pos.y) && checkEndstop( Y_MIN_PIN, y_direction ); // added endstop check
   		z_can_step = (current_pos.z != target_pos.z);
+		
+		//checkSerial();
   	}
   	
   	// this is probably not very useful
