@@ -213,7 +213,7 @@ void dda_move(long micro_delay)
   		// turn on steppers to start moving
   		enable_steppers();
   	}
-  	if(!bPreview && current_pos.z == 0 && target_pos.z == 0 && (tool == TOOL_PEN || tool == TOOL_BRUSH)){
+  	if(!bPreview && current_pos.z == 0 && target_pos.z == 0 && (tool == TOOL_PEN || tool == TOOL_KNIFE)){
 		// let Z fall down if it is at 0 - only in PEN or KNIFE mode!
 		disable_z();
 	}
