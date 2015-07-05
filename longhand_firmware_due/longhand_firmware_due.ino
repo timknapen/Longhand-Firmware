@@ -10,7 +10,7 @@
  
  LONGHAND DRAWING MACHINE firmware
  
- last update 02/07/2015
+ last update 05/07/2015
  by Tim Knapen
  http://www.longhand.cc/
  
@@ -28,7 +28,7 @@
  
  ------------------------------------------------------------*/
 
-#define VERSION "V2.6"
+#define VERSION "V2.7"
 
 // This is meant for Arduino DUE!
 #ifndef _VARIANT_ARDUINO_DUE_X_
@@ -49,7 +49,6 @@ int iSerialBuf = 0;							// position in the serialBuffer
 
 // BEZIER
 float bezierResolution = 10.0f;				// in how many straight lines will I approximate a bezier curve?
-float circleRes = 0.5f;						// circleResolution
 
 // STATES
 #define WORKING 1							// listening to serial, taking commands
@@ -87,8 +86,12 @@ int rotation = 0;                           // in 90° : 1 = 90, 2 = 180, 3 = -9
 // tool selection
 #define TOOL_PEN 1
 #define TOOL_BRUSH 2
+#define TOOL_KNIFE 3
 
 int tool = TOOL_PEN;
+FloatPoint knifeDir = {1,0};
+FloatPoint knifePos = {0,0};
+float knifeRadius = 5;
 
 
 //------------------------------------------------------------
@@ -104,6 +107,21 @@ void setup() {
 	state = WORKING;
 	init_steppers();
 	disable_steppers();
+	
+	// DEBUG
+	FloatPoint p1 = { 3, 3 };
+	FloatPoint p2 = { 0, 2 };
+	print("DEBUG DEBUG \n p1 = ");
+	printPoint(p1);
+	print(", p2 = ");
+	printPoint(p2);
+	print("\n p1 + p2 = ");
+	printPoint(p1 + p2);
+	print("\nRotate p2 90 degrees: ");
+	printPoint( p2.getRotatedRad(PI/2) );
+	print("\n p1 normalize ");
+	printPoint(p1.normalized());
+	
 	
 }
 
@@ -182,9 +200,10 @@ void moveTo(long x, long y, long z) {
 //------------------------------------------------------------
 //------------------------------------------------------------
 void printState() {
-	printPos(current_pos.x, current_pos.y, current_pos.z);
 	
+	printPos(current_pos);
 	println();
+	
 	print(" Longhand ");
 	println(VERSION);
 	if (debug > 1) {
@@ -210,6 +229,7 @@ void printState() {
 	
 	print(" rotation: ");
 	println( rotation );
+	
 	// position
 	print(" Position:\n \t");
 	print(current_pos.x);
@@ -228,6 +248,8 @@ void printState() {
 	print(" mm  (1mm = ");
 	print(mmToStep);
 	println(" steps)");
+	print("\n knife radius: ");
+	println(knifeRadius);
 	
 	print (" free ram: ");
 	println ( freeRam());
@@ -275,14 +297,22 @@ void printState() {
 }
 
 //------------------------------------------------------------
-void printPos(long x, long y, long z) {
+void printPos(LongPoint p) {
 	// print my current position to the serial port
 	print("_p");
-	print((float)x/mmToStep);
+	print((float)p.x/mmToStep);
 	print(" ");
-	print((float)y/mmToStep);
+	print((float)p.y/mmToStep);
 	print(" ");
-	println((float)z/mmToStep);
+	println((float)p.z/mmToStep);
+}
+
+
+//------------------------------------------------------------
+void printPoint(FloatPoint p) {
+	print(p.x);
+	print(", ");
+	print(p.y);
 }
 
 #ifdef __arm__

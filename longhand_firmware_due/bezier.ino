@@ -60,12 +60,16 @@ void bezier(long x0, long y0, long x1, long y1, long x2, long y2, long x3, long 
 
 //--------------------------------------------------------------
 void ellipse(long cx, long cy, long rx, long ry){
+	// 1mm parts in the circle
+	float circum = TWO_PI * min(rx, ry); // circle circumference
+	float circleRes = 360.0 / circum;
+	
 	set_target( cx + rx*cos(PI),
-			   cy + ry*sin(PI),
+			    cy + ry*sin(PI),
 			   0); // pen down!
 	dda_move(min_delay);
 	
-	for(float i = 0; i <= 360.0f; i +=circleRes){
+	for(float i = 0.0; i <= 360.0f; i +=circleRes){
 		set_target(	cx + rx*cos(PI + PI*(float)i/180.0),
 				   cy + ry*sin(PI + PI*(float)i/180.0));
 		dda_move(min_delay);

@@ -165,7 +165,7 @@ void findHome(){
 			delayMicroseconds(current_delay);
 		}
 		
-  		//printPos(current_pos.x, current_pos.y, current_pos.z);
+  		//printPos(current_pos);
   		
   		x_can_step = checkEndstop( X_MIN_PIN, x_direction );
   		y_can_step = checkEndstop( Y_MIN_PIN, y_direction );
@@ -178,7 +178,7 @@ void findHome(){
   	println(MACHINE_STOPPED);
   	set_position(0,0, 100);
   	disable_steppers();
-	printPos(current_pos.x, current_pos.y, current_pos.z);
+	printPos(current_pos);
 }
 
 
@@ -213,8 +213,8 @@ void dda_move(long micro_delay)
   		// turn on steppers to start moving
   		enable_steppers();
   	}
-  	if(!bPreview && current_pos.z == 0 && target_pos.z == 0 && tool == TOOL_PEN){
-		// let Z fall down if it is at 0 - only in PEN mode!
+  	if(!bPreview && current_pos.z == 0 && target_pos.z == 0 && (tool == TOOL_PEN || tool == TOOL_BRUSH)){
+		// let Z fall down if it is at 0 - only in PEN or KNIFE mode!
 		disable_z();
 	}
   	// figure out our deltas
@@ -335,7 +335,7 @@ void dda_move(long micro_delay)
   		}
   		// now I should have done a step and should be able to print out the position
 		if(debug > 1){
-			printPos(current_pos.x, current_pos.y, current_pos.z);
+			printPos(current_pos);
 		}
   		current_delta --;
   		
@@ -358,7 +358,7 @@ void dda_move(long micro_delay)
   	current_pos.z = target_pos.z;
   	
   	if(debug){
-  		printPos((int)current_pos.x, (int)current_pos.y, (int)current_pos.z);
+  		printPos(current_pos);
   	}
   	
 }
@@ -406,7 +406,7 @@ void set_position(long x, long y, long z )
   	current_pos.y = y;
   	current_pos.z = z;
   	set_target(x, y, z);
-  	printPos((int)current_pos.x, (int)current_pos.y, (int)current_pos.z);
+  	printPos(current_pos);
   	
 }
 

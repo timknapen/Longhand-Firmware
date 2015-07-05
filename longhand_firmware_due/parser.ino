@@ -28,7 +28,7 @@ float lVals[MAX_PARSE_VALUES];	// long values
  * o	Origin      : set as origin
  * p	Print       : draw a file
  * q
- * r	CircleRes
+ * r	Radius		: knife radius
  * s	Speeds (delays)
  * t	Testrun
  * u	Microsteps
@@ -49,7 +49,7 @@ void parseMessage(char* input, int length) {
 		println("'");
 		return;
 	}
-	int value = 0; // calculate number following the command
+	float value = 0; // calculate number following the command
 	if (length > 1) {
 		value = atof(&input[1]); //<< length needs to be at least 2 to make this fail safe!
 	}
@@ -102,7 +102,7 @@ void parseMessage(char* input, int length) {
 			
 		case 'd':
 		case 'D':	// toggle debug statements off / on / A LOT
-			debug = value;
+			debug = (bool)value;
 			switch (debug) {
 				case 0:
 					println("Debug is OFF");
@@ -117,7 +117,7 @@ void parseMessage(char* input, int length) {
 			break;
 		case 'n':
 		case 'N':
-			tool = value;
+			tool = (int)value;
 			switch (tool) {
 				default:
 					println("tool set to UNKNOWN");
@@ -128,11 +128,14 @@ void parseMessage(char* input, int length) {
 				case 2:
 					println("tool set to BRUSH");
 					break;
+				case 3:
+					println("tool set to KNIFE");
+					break;
 			}
 			break;
 		case 'i':
 		case 'I':	// set bezier resolution
-			bezierResolution = value;
+			bezierResolution = (int)value;
 			if (bezierResolution == 0.0f) bezierResolution = 1.0f;
 			if (debug) {
 				print("Bezier Resolution: ");
@@ -142,11 +145,11 @@ void parseMessage(char* input, int length) {
 			
 		case 'r':
 		case 'R':	//set resolution for circles
-			circleRes = value;
-			if (circleRes < 0.1) circleRes = 1;
+			knifeRadius = value;
+			if (knifeRadius < 0) knifeRadius = 1;
 			if (debug) {
-				print("Circle resolution (x10)= ");
-				println(10 * circleRes);
+				print("knifeRadius = ");
+				println(knifeRadius);
 			}
 			break;
 			
@@ -337,8 +340,8 @@ void parseArc(char* mssg, int length) {
 	if (valnum < 5) return;
 	// arc(x,y, radius, beginAngle, endAngle )
 	arc((long)(mmToStep * scale * fVals[0]),
-		  (long)(mmToStep * scale * fVals[1]),
-		  (long)(mmToStep * scale * fVals[2]),
+		(long)(mmToStep * scale * fVals[1]),
+		(long)(mmToStep * scale * fVals[2]),
 		(long)fVals[3],
 		(long)fVals[4] );
 }
@@ -382,6 +385,12 @@ void parseMoveTo(char* mssg, int length) {
 		x *= scale;
 		y *= scale;
 		
+	}
+	
+	if(tool == TOOL_KNIFE && isDrawingFromFile){ // move to target + knifedir
+		knifePos.set(x,y);
+		x += knifeDir.x;
+		y += knifeDir.y;
 	}
 	
 	x *= mmToStep;
@@ -430,7 +439,6 @@ void parseRelativeMoveTo(char* mssg, int length) {
 	
 	x *= mmToStep;
 	y *= mmToStep;
-	
 	moveTo(current_pos.x + (long)x, current_pos.y + (long)y, current_pos.z + (long)z);
 }
 
@@ -467,17 +475,78 @@ void parseLineTo(char* mssg, int length) {
 		
 	}
 	
-	x *= mmToStep;
-	y *= mmToStep;
-	
+	// put the pen down if necessary
 	if (current_pos.z != (long)z) {
 		moveTo(current_pos.x, current_pos.y, (long)z);
 	}
+	
+	// when using the knife rotate to the new direction first!
+	if(tool == TOOL_KNIFE && isDrawingFromFile){ // move to target + knifedir
+		FloatPoint next = { x, y }; // our target
+		FloatPoint cur = knifePos;
+		float a1 = atan2(knifeDir.y, knifeDir.x);
+		knifeDir  = ((next - cur).normalized()) * knifeRadius;
+		float a2 = atan2(knifeDir.y, knifeDir.x);
+		float adif = angleDif(a1, a2);
+		
+		FloatPoint r = {knifeRadius, 0};
+		float stepAngle = TWO_PI/18.0f; // 20° steps
+		if(adif < 0){
+			stepAngle *= -1;
+		}
+		int circleParts = abs(adif/stepAngle);
+		FloatPoint p;
+		for(int j = 1; j < circleParts; j++){
+			p = cur + r.getRotatedRad(a1 + (float)j*stepAngle);
+			moveTo(offSet.x + (long)(p.x * mmToStep), offSet.y + (long)(p.y * mmToStep), (long)z);
+		}
+		p = cur + knifeDir;
+		moveTo(offSet.x + (long)(p.x * mmToStep), offSet.y + (long)(p.y * mmToStep), (long)z);
+		
+		// add overshoot
+		x += knifeDir.x;
+		y += knifeDir.y;
+		knifePos = next;
+	}
+	
+	
+	x *= mmToStep;
+	y *= mmToStep;
+	
 	
 	moveTo(offSet.x + (long)x, offSet.y + (long)y, (long)z);
 }
 
 
+//--------------------------------------------------------------
+float angleDif(float angle1, float angle2){
+	
+	// solving this once and for all
+	// angle 1 turns to angle 2 (clockwise
+	// if angle 1 = 170 && angle 2 = -170 => distance = +20
+	// BUT angle 2 - angle 1 = 340!!!
+	// angle 1 & 2 in radians!
+	// OUTPUT IN RADIANS : from -PI to +PI
+	float normal =	angle2 - angle1;
+	float anormal =	fabsf(normal);
+	float plus =	angle2 - angle1 + TWO_PI;
+	float aplus =	fabsf(plus);
+	float min =		angle2 - angle1 - TWO_PI;
+	float amin =	fabsf(min);
+	if(amin < aplus){
+		if(amin < anormal){
+			return min;
+		}else  {
+			return normal;
+		}
+	}else {
+		if(aplus < anormal){
+			return plus;
+		}else {
+			return normal;
+		}
+	}
+}
 
 
 
