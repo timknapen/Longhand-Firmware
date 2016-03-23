@@ -323,6 +323,7 @@ void parseDelays(char * mssg, int length) {
 void parseBezier( char * mssg, int length) {
 	int valnum =  parseFloats(mssg, length);
 	if ( valnum < 8) return;
+	setLight(true);
 	bezier((long)(mmToStep * scale * fVals[0]),
 		   (long)(mmToStep * scale * fVals[1]),
 		   (long)(mmToStep * scale * fVals[2]),
@@ -331,6 +332,7 @@ void parseBezier( char * mssg, int length) {
 		   (long)(mmToStep * scale * fVals[5]),
 		   (long)( mmToStep * scale * fVals[6]),
 		   (long)(mmToStep * scale * fVals[7]));
+	setLight(false);
 }
 
 
@@ -339,11 +341,14 @@ void parseArc(char* mssg, int length) {
 	int valnum =  parseFloats(mssg, length);
 	if (valnum < 5) return;
 	// arc(x,y, radius, beginAngle, endAngle )
+	setLight(true);
 	arc((long)(mmToStep * scale * fVals[0]),
 		(long)(mmToStep * scale * fVals[1]),
 		(long)(mmToStep * scale * fVals[2]),
 		(long)fVals[3],
 		(long)fVals[4] );
+	setLight(false);
+
 }
 
 
@@ -351,15 +356,20 @@ void parseArc(char* mssg, int length) {
 void parseEllipse(char* mssg, int length) {
 	int valnum =  parseFloats(mssg, length);
 	if (valnum < 4) return;
+	setLight(true);
 	ellipse((long)(mmToStep * scale * fVals[0]),
 			(long)(mmToStep * scale * fVals[1]),
 			(long)(mmToStep * scale * fVals[2]),
 			(long)(mmToStep * scale * fVals[3]));
+	setLight(false);
+
 }
 
 
 //------------------------------------------------------------
 void parseMoveTo(char* mssg, int length) {
+	setLight(false);
+
 	int valnum =  parseFloats(mssg, length);
 	if (valnum < 2) return;
 	float x = fVals[0];
@@ -407,6 +417,8 @@ void parseMoveTo(char* mssg, int length) {
 
 //------------------------------------------------------------
 void parseRelativeMoveTo(char* mssg, int length) {
+	setLight(false);
+
 	int valnum =  parseFloats(mssg, length);
 	if (valnum < 2) return;
 	float x = fVals[0];
@@ -450,11 +462,12 @@ void parseLineTo(char* mssg, int length) {
 	float y = fVals[1];
 	float z = 0;
 	if (valnum < 3) { // z was not set, so use 0
-		fVals[2] = 0;
+		z = 0;
+	}else{
+		z = fVals[2];
 	}
 	
 	if (isDrawingFromFile) { // only scale and rotate when drawing from file
-		
 		switch (rotation) {
 			case 1: // 90
 				x = - fVals[1];
@@ -475,8 +488,8 @@ void parseLineTo(char* mssg, int length) {
 		
 	}
 	
-	// put the pen down if necessary
-	if (current_pos.z != (long)z) {
+	// put the pen down if necessary, but only when no Z was defined...
+	if (current_pos.z != (long)z && valnum < 3)) {
 		moveTo(current_pos.x, current_pos.y, (long)z);
 	}
 	
@@ -513,8 +526,10 @@ void parseLineTo(char* mssg, int length) {
 	x *= mmToStep;
 	y *= mmToStep;
 	
-	
+	setLight(true);
 	moveTo(offSet.x + (long)x, offSet.y + (long)y, (long)z);
+	setLight(false);
+
 }
 
 

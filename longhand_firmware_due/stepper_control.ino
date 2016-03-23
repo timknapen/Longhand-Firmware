@@ -51,10 +51,11 @@ void init_steppers()
   	// set the endstops
   	pinMode(X_MIN_PIN, INPUT);
   	pinMode(Y_MIN_PIN, INPUT);
-  	pinMode(Z_MIN_PIN, INPUT);
   	digitalWrite(X_MIN_PIN, HIGH); // set internal 100 KOhm pull up resistor
   	digitalWrite(Y_MIN_PIN, HIGH);
-  	digitalWrite(Z_MIN_PIN, HIGH);
+	
+	pinMode(LED_PIN, OUTPUT);	// use the Z pin to control light!
+  	digitalWrite(LED_PIN, LOW);	// switch off the light
   	
   	
   	// get the microSteps pins set

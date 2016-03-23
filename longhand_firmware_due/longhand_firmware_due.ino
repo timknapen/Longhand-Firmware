@@ -10,7 +10,7 @@
  
  LONGHAND DRAWING MACHINE firmware
  
- last update 05/07/2015
+ last update 22/03/2016
  by Tim Knapen
  http://www.longhand.cc/
  
@@ -28,7 +28,7 @@
  
  ------------------------------------------------------------*/
 
-#define VERSION "V2.7"
+#define VERSION "V2.8"
 
 // This is meant for Arduino DUE!
 #ifndef _VARIANT_ARDUINO_DUE_X_
@@ -192,6 +192,15 @@ void moveTo(long x, long y, long z) {
 	}
 	set_target(x, y, z);
 	dda_move(max_delay);
+}
+
+//-----------------------------------------------------------
+void setLight(bool isOn){
+	if(isOn && !bPreview){
+		digitalWrite(LED_PIN, HIGH);	// switch off the light
+	}else{
+		digitalWrite(LED_PIN, LOW); // switch on the light
+	}
 }
 
 
