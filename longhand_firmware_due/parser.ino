@@ -374,9 +374,12 @@ void parseMoveTo(char* mssg, int length) {
 	if (valnum < 2) return;
 	float x = fVals[0];
 	float y = fVals[1];
+	float z = 100;
+	if(valnum >= 3){
+		z = fVals[2];
+	}
 	
 	if (isDrawingFromFile) { // only scale and rotate when drawing from file
-		
 		switch (rotation) {
 			case 1: // 90
 				x = - fVals[1];
@@ -406,12 +409,16 @@ void parseMoveTo(char* mssg, int length) {
 	x *= mmToStep;
 	y *= mmToStep;
 	
-	if ( current_pos.x == (long)x && current_pos.y == (long)y) {
-		// it's a useless move to!
+	if( tool == TOOL_LIGHT ){
+		moveTo(offSet.x + (long)x, offSet.y + (long)y, (long)z);
 		return;
 	}
-	moveTo((long)(current_pos.x), (long)(current_pos.y), 100); // brush up at current position
-	moveTo(offSet.x + (long)x, offSet.y + (long)y, 100);
+	if ( current_pos.x == (long)x && current_pos.y == (long)y) {
+		// it's a useless moveTo!
+		return;
+	}
+	moveTo((long)(current_pos.x), (long)(current_pos.y), z); // brush up at current position
+	moveTo(offSet.x + (long)x, offSet.y + (long)y, z);
 }
 
 
@@ -489,7 +496,7 @@ void parseLineTo(char* mssg, int length) {
 	}
 	
 	// put the pen down if necessary, but only when no Z was defined...
-	if (current_pos.z != (long)z && valnum < 3)) {
+	if (current_pos.z != (long)z && valnum < 3 && tool != TOOL_LIGHT ) {
 		moveTo(current_pos.x, current_pos.y, (long)z);
 	}
 	

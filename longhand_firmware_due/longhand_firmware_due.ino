@@ -10,7 +10,7 @@
  
  LONGHAND DRAWING MACHINE firmware
  
- last update 22/03/2016
+ last update 04/04/2016
  by Tim Knapen
  http://www.longhand.cc/
  
@@ -84,9 +84,10 @@ int scale = 1;                              // scale factor
 int rotation = 0;                           // in 90° : 1 = 90, 2 = 180, 3 = -90
 
 // tool selection
-#define TOOL_PEN 1
-#define TOOL_BRUSH 2
-#define TOOL_KNIFE 3
+#define TOOL_PEN 1							// pen releases the pen and lets it fall by gravity while drawing lines.
+#define TOOL_BRUSH 2						// brush holds the pen on 0, doesn't let it fall.
+#define TOOL_KNIFE 3						// knife makes the pen do extra moves to rotate the knife in the correct direction before cutting
+#define TOOL_LIGHT 4						// light keeps the pen in the air and can go below z=0
 
 int tool = TOOL_PEN;
 FloatPoint knifeDir = {1,0};
@@ -175,20 +176,27 @@ void moveTo(long x, long y) {
 
 //------------------------------------------------------------
 void moveTo(long x, long y, long z) {
-	if ( (x < 0 || y < 0 || z < 0  || z > 200) && !bPreview) {
-		// should only happen when setting the home position / doing relative moves
-		print("Warning!! new target is ");
-		print(x);
-		print(", ");
-		print(y);
-		print(", ");
-		println(z);
-		return;
-	}
+
 	if ( bPreview ) {
 		// calculate the distance
 		travelDistance += (unsigned long) sqrt( (x - current_pos.x) * (x - current_pos.x) +
 											   (y - current_pos.y) * (y - current_pos.y));
+	}else{
+		if( x < 0 ){ // should only happen when setting the home position / doing relative moves
+			print("Warning!! New target X is ");
+			println(x);
+			return;
+		}
+		if( y < 0 ){
+			print("Warning!! New target Y is ");
+			println(y);
+			return;
+		}
+		if( z < 0 && !(tool == TOOL_LIGHT)){ // when light z can go below 0
+			print("Warning!! New target Z is ");
+			println(z);
+			return;
+		}
 	}
 	set_target(x, y, z);
 	dda_move(max_delay);
