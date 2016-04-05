@@ -76,7 +76,7 @@ LongPoint target_pos;						// target position in steps
 LongPoint delta_steps;						// the distances on each axis
 LongPoint offSet;
 
-float mmToStep = 42.735;					// convert mm commands to steps!
+float mmToStep = 42.929; //42.735;			// convert mm commands to steps!
 
 // scale existing drawings, but only when drawing from file!
 bool isDrawingFromFile = false;             // are we drawing from a file?
