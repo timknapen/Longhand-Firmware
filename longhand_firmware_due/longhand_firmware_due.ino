@@ -64,7 +64,7 @@ int current_delay = 1000;					// in microsecs
 int min_delay =		1000;					// the fastest speed possible
 int max_delay =		3000;					// the slowest speed possible.
 int acceleration =	10;					// gets added each step to the delay to calculate the acceleration speed
-int microSteps =	8;					// the type of microsteps we are taking, default is 1/8th step
+int microSteps =	16;					// the type of microsteps we are taking, default is 1/8th step
 
 
 // DISTANCE (keep track of how long a print will take)
@@ -76,11 +76,12 @@ LongPoint target_pos;						// target position in steps
 LongPoint delta_steps;						// the distances on each axis
 LongPoint offSet;
 
-float mmToStep = 42.929; //42.735;			// convert mm commands to steps!
+float mmToStep = 85.571;		// 16microsteps
+//42.929; //42.735;			// convert mm commands to steps!
 
 // scale existing drawings, but only when drawing from file!
 bool isDrawingFromFile = false;             // are we drawing from a file?
-int scale = 1;                              // scale factor
+float scale = 1;                              // scale factor
 int rotation = 0;                           // in 90° : 1 = 90, 2 = 180, 3 = -90
 
 // tool selection
