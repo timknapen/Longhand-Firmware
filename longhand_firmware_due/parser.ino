@@ -131,6 +131,9 @@ void parseMessage(char* input, int length) {
 				case 3:
 					println("tool set to KNIFE");
 					break;
+				case 4:
+					println("tool set to LIGHT");
+					break;
 			}
 			break;
 		case 'i':
