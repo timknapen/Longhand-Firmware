@@ -10,7 +10,7 @@
  
  LONGHAND DRAWING MACHINE firmware
  
- last update 04/04/2016
+ last update 07/04/2016
  by Tim Knapen
  http://www.longhand.cc/
  
@@ -28,7 +28,7 @@
  
  ------------------------------------------------------------*/
 
-#define VERSION "V2.8"
+#define VERSION "V2.8.1"
 
 // This is meant for Arduino DUE!
 #ifndef _VARIANT_ARDUINO_DUE_X_

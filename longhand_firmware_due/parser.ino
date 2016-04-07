@@ -377,7 +377,7 @@ void parseMoveTo(char* mssg, int length) {
 	if (valnum < 2) return;
 	float x = fVals[0];
 	float y = fVals[1];
-	float z = 100;
+	float z = 200;
 	if(valnum >= 3){
 		z = fVals[2];
 	}
@@ -433,7 +433,7 @@ void parseRelativeMoveTo(char* mssg, int length) {
 	if (valnum < 2) return;
 	float x = fVals[0];
 	float y = fVals[1];
-	float z = 0;
+	float z = 200;
 	if (valnum >= 3) { // z was not set, so use 0
 		z = fVals[2];
 	}
