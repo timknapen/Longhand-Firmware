@@ -57,11 +57,6 @@ void init_steppers()
 	pinMode(LED_PIN, OUTPUT);	// use the Z pin to control light!
   	digitalWrite(LED_PIN, LOW);	// switch off the light
   	
-  	
-  	// get the microSteps pins set
-  	// default is 1/8th steps
-  	setMicroSteps(8);
-  	
   	// turn them off to start.
   	disable_steppers();
   	
@@ -109,7 +104,7 @@ void findHome(){
 	long target_delay = min_delay;
   	enable_steppers();
 	
-	moveTo(current_pos.x, current_pos.y, current_pos.z + 100); // lift brush on current position
+	moveTo(current_pos.x, current_pos.y, 200); // lift brush on current position
 	
   	bool x_can_step = 1;
   	bool y_can_step = 1;
@@ -214,7 +209,11 @@ void dda_move(long micro_delay)
   		// turn on steppers to start moving
   		enable_steppers();
   	}
-  	if(!bPreview && current_pos.z == 0 && target_pos.z == 0 && (tool == TOOL_PEN || tool == TOOL_KNIFE)){
+  	if(!bPreview &&								// we are really drawing
+	   current_pos.z == 0 &&					// we are at Z = 0
+	   target_pos.z == 0 &&						// we are staying at Z = 0
+	   (tool == TOOL_PEN || tool == TOOL_KNIFE) // we are using a tool that wants gravity to do its job
+	   ){
 		// let Z fall down if it is at 0 - only in PEN or KNIFE mode!
 		disable_z();
 	}
@@ -439,56 +438,6 @@ void disable_z()
 {
   	digitalWrite(Z_ENABLE_PIN, !ENABLE_ON);
 }
-
-
-//-------------------------------------------------------------------
-void setMicroSteps(int _microSteps){
-  	println(" microsteps are set by jumper");
-  	// MICROSTEPS
-  	//	MS1		MS2		MS3
-  	//	0		0		0	1
-  	//	1		0		0	1/2
-  	//	0		1		0	1/4
-  	//	1		1		0	1/8
-  	//	1		1		1	1/16
-  	
-	/*
-	 switch (_microSteps) {
-	 case 1:
-	 digitalWrite(MS1_PIN, LOW);
-	 digitalWrite(MS2_PIN, LOW);
-	 digitalWrite(MS3_PIN, LOW);
-	 break;
-	 case 2:
-	 digitalWrite(MS1_PIN, HIGH);
-	 digitalWrite(MS2_PIN, LOW);
-	 digitalWrite(MS3_PIN, LOW);
-	 break;
-	 case 4:
-	 digitalWrite(MS1_PIN, LOW);
-	 digitalWrite(MS2_PIN, HIGH);
-	 digitalWrite(MS3_PIN, LOW);
-	 break;
-	 case 8:
-	 digitalWrite(MS1_PIN, HIGH);
-	 digitalWrite(MS2_PIN, HIGH);
-	 digitalWrite(MS3_PIN, LOW);
-	 break;
-	 case 16:
-	 digitalWrite(MS1_PIN, HIGH);
-	 digitalWrite(MS2_PIN, HIGH);
-	 digitalWrite(MS3_PIN, HIGH);
-	 break;
-	 default:
-	 print(_microSteps);
-	 println(" is not a correct microstep setting");
-	 return;
-	 break;
-	 }
-	 microSteps = _microSteps;
-	 */
-}
-
 
 
 

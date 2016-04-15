@@ -25,10 +25,11 @@
  - Arduino 1.5.6-r2 serialUSBPatched
   updated CDC.cpp and USBCore.cpp see: http://forum.arduino.cc/index.php/topic,140543.0.html
  - Arduino 1.5.8 ? (has both files already patched!)
+ - Arduino 1.6.7
  
  ------------------------------------------------------------*/
 
-#define VERSION "V2.8.1"
+#define VERSION "V2.8.2"
 
 // This is meant for Arduino DUE!
 #ifndef _VARIANT_ARDUINO_DUE_X_
@@ -63,8 +64,8 @@ bool bPreview = true;						// to check if I'm doing a preview, not actually draw
 int current_delay = 1000;					// in microsecs
 int min_delay =		1000;					// the fastest speed possible
 int max_delay =		3000;					// the slowest speed possible.
-int acceleration =	10;					// gets added each step to the delay to calculate the acceleration speed
-int microSteps =	16;					// the type of microsteps we are taking, default is 1/8th step
+int acceleration =	10;						// gets added each step to the delay to calculate the acceleration speed
+int microSteps =	16;						// the type of microsteps we are taking, default is 1/8th step
 
 
 // DISTANCE (keep track of how long a print will take)
@@ -76,12 +77,12 @@ LongPoint target_pos;						// target position in steps
 LongPoint delta_steps;						// the distances on each axis
 LongPoint offSet;
 
-float mmToStep = 85.571;		// 16microsteps
-//42.929; //42.735;			// convert mm commands to steps!
+float mmToStep = 85.571;					// 16microsteps
+//42.929; //42.735;							// convert mm commands to steps!
 
 // scale existing drawings, but only when drawing from file!
 bool isDrawingFromFile = false;             // are we drawing from a file?
-float scale = 1;                              // scale factor
+float scale = 1;							// scale factor
 int rotation = 0;                           // in 90° : 1 = 90, 2 = 180, 3 = -90
 
 // tool selection
@@ -91,6 +92,12 @@ int rotation = 0;                           // in 90° : 1 = 90, 2 = 180, 3 = -9
 #define TOOL_LIGHT 4						// light keeps the pen in the air and can go below z=0
 
 int tool = TOOL_PEN;
+
+
+// Z axis extremes, used when drawing with light (can go below zero)
+#define Z_MIN -20							// do not allow the Z axis to go below this value
+#define Z_MAX 400							// do not allow the Z axis to go above this value
+
 FloatPoint knifeDir = {1,0};
 FloatPoint knifePos = {0,0};
 float knifeRadius = 5;
@@ -197,6 +204,12 @@ void moveTo(long x, long y, long z) {
 			print("Warning!! New target Z is ");
 			println(z);
 			return;
+		}
+		if( tool == TOOL_LIGHT && (z > Z_MAX || z < Z_MIN)){
+			print("Warning!! New target Z is out of bounds: ")
+			println(z);
+			z = max(Z_MIN, min(Z_MAX, z)); // stay within bounds but don't cancel this move
+			//return;
 		}
 	}
 	set_target(x, y, z);

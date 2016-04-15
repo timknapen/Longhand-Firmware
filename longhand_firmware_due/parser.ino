@@ -176,9 +176,7 @@ void parseMessage(char* input, int length) {
 			
 		case 'u':
 		case 'U':
-			setMicroSteps(value);
-			print("Microsteps set to 1/");
-			println(value);
+			println("Microsteps are set by jumper");
 			break;
 			
 		case 'x':
