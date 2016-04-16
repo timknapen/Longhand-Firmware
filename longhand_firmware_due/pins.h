@@ -41,7 +41,7 @@
 // END STOPS
 #define X_MIN_PIN		(byte)9
 #define Y_MIN_PIN		(byte)2
-#define LED_PIN		(byte)3
+#define LED_PIN			(byte)3
 
 
 #endif

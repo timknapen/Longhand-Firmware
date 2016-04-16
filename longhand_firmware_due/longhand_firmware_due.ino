@@ -95,8 +95,8 @@ int tool = TOOL_PEN;
 
 
 // Z axis extremes, used when drawing with light (can go below zero)
-#define Z_MIN -20							// do not allow the Z axis to go below this value
-#define Z_MAX 400							// do not allow the Z axis to go above this value
+#define Z_MIN -100							// do not allow the Z axis to go below this value
+#define Z_MAX 600							// do not allow the Z axis to go above this value
 
 FloatPoint knifeDir = {1,0};
 FloatPoint knifePos = {0,0};
@@ -219,9 +219,11 @@ void moveTo(long x, long y, long z) {
 //-----------------------------------------------------------
 void setLight(bool isOn){
 	if(isOn && !bPreview){
-		digitalWrite(LED_PIN, HIGH);	// switch off the light
+		//digitalWrite(LED_PIN, HIGH);	// switch off the light
+		analogWrite(LED_PIN, 4); //10
 	}else{
-		digitalWrite(LED_PIN, LOW); // switch on the light
+		//digitalWrite(LED_PIN, LOW); // switch on the light
+		analogWrite(LED_PIN, 0);
 	}
 }
 

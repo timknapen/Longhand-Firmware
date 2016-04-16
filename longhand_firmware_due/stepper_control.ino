@@ -55,8 +55,9 @@ void init_steppers()
   	digitalWrite(Y_MIN_PIN, HIGH);
 	
 	pinMode(LED_PIN, OUTPUT);	// use the Z pin to control light!
-  	digitalWrite(LED_PIN, LOW);	// switch off the light
-  	
+  	//digitalWrite(LED_PIN, LOW);	// switch off the light
+	setLight(false);
+	
   	// turn them off to start.
   	disable_steppers();
   	
