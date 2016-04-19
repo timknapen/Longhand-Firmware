@@ -29,7 +29,7 @@
  
  ------------------------------------------------------------*/
 
-#define VERSION "V2.8.2"
+#define VERSION "V2.8.4"
 
 // This is meant for Arduino DUE!
 #ifndef _VARIANT_ARDUINO_DUE_X_
@@ -40,7 +40,7 @@
 #define bufferLength 64                     // serial buffer length
 char serialBuffer[bufferLength];            // serial buffer
 int iSerialBuf = 0;							// position in the serialBuffer
-#define endline '\n'						// a command always ends with a newline '\n'
+
 
 // fix for mixing up of serial messages!
 #define serialDelay 200
@@ -138,7 +138,6 @@ void setup() {
 void loop() {
 	
 	stateMachine();
-	
 	// while doing nothing make the delay go to max (slowest speed)
 	current_delay += acceleration;
 	current_delay = min( current_delay, max_delay);
@@ -213,11 +212,14 @@ void moveTo(long x, long y, long z) {
 		}
 	}
 	set_target(x, y, z);
-	dda_move(max_delay);
+	dda_move(max_delay); // end move is to the   
 }
 
 //-----------------------------------------------------------
 void setLight(bool isOn){
+	if(tool != TOOL_LIGHT){
+		return;
+	}
 	if(isOn && !bPreview){
 		//digitalWrite(LED_PIN, HIGH);	// switch off the light
 		analogWrite(LED_PIN, 4); //10
@@ -337,7 +339,7 @@ void printPos(LongPoint p) {
 	print(" ");
 	print((float)p.y/mmToStep);
 	print(" ");
-	println((float)p.z/mmToStep);
+	println((float)p.z); // /mmToStep); // <=== Z has no mmToStep yet!
 }
 
 

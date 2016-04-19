@@ -154,7 +154,8 @@ void parseFileContents(File file){
   			char c =  file.read();
   			if( i < bufferLength){
   				switch (c){
-  					case '\n':
+  					case '\n': // newline
+					case '\r':
   						buf[i] = '\0';  // end string
   						parseMessage(buf, i);
   						i = 0;

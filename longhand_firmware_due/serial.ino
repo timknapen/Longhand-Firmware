@@ -4,7 +4,8 @@ void checkSerial(){
     while (SerialUSB.available() > 0){
 		char inByte = SerialUSB.read();
         switch(inByte){
-            case endline:
+            case '\n':
+            case '\r':
                 serialBuffer[iSerialBuf] = '\0'; // add null terminator
                 parseMessage(serialBuffer, iSerialBuf);
                 iSerialBuf = 0;

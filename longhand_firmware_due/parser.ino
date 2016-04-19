@@ -82,11 +82,11 @@ void parseMessage(char* input, int length) {
 			
 			
 		case 'l':
-		case 'L':	// Line to
+		case 'L':	// Absolute line to
 			parseLineTo(&input[1], length - 1);
 			break;
 			
-		case 'm':	// Move to
+		case 'm':	// Absolute move to
 			parseMoveTo(&input[1], length - 1);
 			break;
 		case 'M':	// Relative move to
@@ -410,15 +410,16 @@ void parseMoveTo(char* mssg, int length) {
 	x *= mmToStep;
 	y *= mmToStep;
 	
-	if( tool == TOOL_LIGHT ){
-		moveTo(offSet.x + (long)x, offSet.y + (long)y, (long)z);
-		return;
-	}
-	if ( current_pos.x == (long)x && current_pos.y == (long)y) {
+	if ( current_pos.x == (long)x && current_pos.y == (long)y && current_pos.z == (long)z) {
 		// it's a useless moveTo!
 		return;
 	}
-	moveTo((long)(current_pos.x), (long)(current_pos.y), z); // brush up at current position
+	
+	if(valnum < 3 && tool != TOOL_LIGHT){
+		// only lift the pen at current position when it's a simple move
+		// don't lift it when we are using light.
+		moveTo((long)(current_pos.x), (long)(current_pos.y), (long)z);
+	}
 	moveTo(offSet.x + (long)x, offSet.y + (long)y, z);
 }
 
@@ -497,7 +498,7 @@ void parseLineTo(char* mssg, int length) {
 	}
 	
 	// put the pen down if necessary, but only when no Z was defined...
-	if (current_pos.z != (long)z && valnum < 3 && tool != TOOL_LIGHT ) {
+	if (current_pos.z != (long)z && valnum < 3 ) {
 		moveTo(current_pos.x, current_pos.y, (long)z);
 	}
 	
