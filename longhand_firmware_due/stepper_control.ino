@@ -370,7 +370,7 @@ inline void step_axes(bool x_needs_to_step, bool y_needs_to_step, bool z_needs_t
 		if( x_needs_to_step) digitalWrite(X_STEP_PIN, HIGH);
 		if( y_needs_to_step) digitalWrite(Y_STEP_PIN, HIGH);
 		if( z_needs_to_step) digitalWrite(Z_STEP_PIN, HIGH);
-		delayMicroseconds(5); // A4988 needs at least 1 microsecond to register a step
+		delayMicroseconds(1); // A4988 needs at least 1 microsecond to register a step
 		if( x_needs_to_step) digitalWrite(X_STEP_PIN, LOW);
 		if( y_needs_to_step) digitalWrite(Y_STEP_PIN, LOW);
 		if( z_needs_to_step) digitalWrite(Z_STEP_PIN, LOW);
